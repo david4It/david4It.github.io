@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>单点登录（一）</title>
-    <url>/2020/06/01/ckb0kxy790000zsvjgepyd2cb/</url>
+    <url>/2020/06/01/ckb0lnljb0000pwvjh30rh4kq/</url>
     <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>在分布式环境中，存在多个子系统，每个子系统独立部署。当用户登录其中一个系统之后，若需要访问另一个系统，使用传统方式session的话，就需要用户登录，一旦子系统数量众多，那么用户则需要在多个系统中进行登录，用户体验相当差。</p>
 <a id="more"></a>
 
@@ -57,7 +57,7 @@
   </entry>
   <entry>
     <title>单点登录（三）</title>
-    <url>/2020/06/03/ckb0kxy7u0007zsvj8myoc2dh/</url>
+    <url>/2020/06/03/ckb0lnlkc0007pwvj3x161ub4/</url>
     <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>CAS Server的基本定制已经完成，接下来就需要对Client进行开发和测试，保证整个业务流程的正确性。这里通过两个client项目进行演示：其中一个项目使用filter方式进行认证；而另一个项目则采用spring security cas的方式进行认证。</p>
 <a id="more"></a>
 
@@ -130,7 +130,7 @@
 <p><img src="/images/sso/5.png" alt="avatar"></p>
 </li>
 </ol>
-<p>根据[官方问题指导]([<a href="https://apereo.github.io/cas/4.2.x/installation/Troubleshooting-Guide.html#:~:text=%E2%80%9CToo%20many%20redirect%E2%80%9D%20errors%20are,you%20will%20find%20the%20cause.]" target="_blank" rel="noopener">https://apereo.github.io/cas/4.2.x/installation/Troubleshooting-Guide.html#:~:text=%E2%80%9CToo%20many%20redirect%E2%80%9D%20errors%20are,you%20will%20find%20the%20cause.]</a>(<a href="https://apereo.github.io/cas/4.2.x/installation/Troubleshooting-Guide.html#:~:text=&quot;Too" target="_blank" rel="noopener">https://apereo.github.io/cas/4.2.x/installation/Troubleshooting-Guide.html#:~:text=&quot;Too</a> many redirect” errors are,you will find the cause.))可以了解到，这一定是配置上出现了问题。期初我的yml配置如下</p>
+<p>根据<a href="https://apereo.github.io/cas/4.2.x/installation/Troubleshooting-Guide.html" target="_blank" rel="noopener">官方问题指导</a>可以了解到，这一定是配置上出现了问题。期初我的yml配置如下</p>
 <figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">cas:</span></span><br><span class="line">  <span class="attr">server-url-prefix:</span> <span class="string">https://david4it.com:8443/cas</span></span><br><span class="line">  <span class="attr">server-login-url:</span> <span class="string">https://david4it.com:8443/cas/login</span></span><br><span class="line">  <span class="attr">server-logout-url:</span> <span class="string">https://david4it.com:8443/cas/logout</span></span><br><span class="line">  <span class="comment">#client-host-url: http://message.client.com:9099/login/cas 正确配置</span></span><br><span class="line">  <span class="attr">client-host-url:</span> <span class="string">http://message.client.com:9099</span></span><br><span class="line">  <span class="attr">client-logout-url:</span> <span class="string">http://message.client.com:9099/logout</span></span><br></pre></td></tr></table></figure>
 
 <p>并且我的security配置也并没有放行<code>/login/cas</code>路径的校验。</p>
@@ -151,7 +151,7 @@
   </entry>
   <entry>
     <title>单点登录（二）</title>
-    <url>/2020/06/02/ckb0kxy7v0008zsvj5x60gvrl/</url>
+    <url>/2020/06/02/ckb0lnlkd0008pwvj9wsg3jfd/</url>
     <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>已经对SSO以及CAS的基本概念和流程有了一定了解之后，就可以开始着手实现自己的CAS认证服务器了。本文主要讲解如何在本地使用HTTPS的方式启动CAS Server，以及定制CAS Server的部分页面。</p>
 <a id="more"></a>
 
