@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>单点登录（一）</title>
-    <url>/2020/06/01/ckb0khpqp0000twvjceb1c0fy/</url>
+    <url>/2020/06/01/ckb0kxy790000zsvjgepyd2cb/</url>
     <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>在分布式环境中，存在多个子系统，每个子系统独立部署。当用户登录其中一个系统之后，若需要访问另一个系统，使用传统方式session的话，就需要用户登录，一旦子系统数量众多，那么用户则需要在多个系统中进行登录，用户体验相当差。</p>
 <a id="more"></a>
 
@@ -57,7 +57,7 @@
   </entry>
   <entry>
     <title>单点登录（三）</title>
-    <url>/2020/06/03/ckb0khpr90007twvjc15xboq3/</url>
+    <url>/2020/06/03/ckb0kxy7u0007zsvj8myoc2dh/</url>
     <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>CAS Server的基本定制已经完成，接下来就需要对Client进行开发和测试，保证整个业务流程的正确性。这里通过两个client项目进行演示：其中一个项目使用filter方式进行认证；而另一个项目则采用spring security cas的方式进行认证。</p>
 <a id="more"></a>
 
@@ -151,7 +151,7 @@
   </entry>
   <entry>
     <title>单点登录（二）</title>
-    <url>/2020/06/02/ckb0khpra0008twvjf1fl6bob/</url>
+    <url>/2020/06/02/ckb0kxy7v0008zsvj5x60gvrl/</url>
     <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>已经对SSO以及CAS的基本概念和流程有了一定了解之后，就可以开始着手实现自己的CAS认证服务器了。本文主要讲解如何在本地使用HTTPS的方式启动CAS Server，以及定制CAS Server的部分页面。</p>
 <a id="more"></a>
 
