@@ -1,299 +1,292 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Nacos</title>
-    <url>/2020/ckati3skc0002s1sbgl8ge2ri/</url>
-    <content><![CDATA[<h2 id="Nacos"><a href="#Nacos" class="headerlink" title="Nacos"></a>Nacos</h2><h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p>Nacos 致力于帮助您发现、配置和管理微服务。Nacos 提供了一组简单易用的特性集，帮助您快速实现动态服务发现、服务配置、服务元数据及流量管理。</p>
-<h3 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h3><ul>
-<li><p>服务注册发现和服务健康检测</p>
-<p>Nacos支持基于DNS和基于RPC的服务发现，服务端可以通过SDK或者Api进行服务注册，相应的服务消费者可以使用DNS或者Http查找的方式获取服务列表。Nacos同时提供对服务的实时健康检查，阻止向不健康的主机或服务发送请求，与Eureka类似Nacos也有友好的控制台界面。<br><img src="/images/Nacos/1.png" alt="avatar"></p>
-</li>
-<li><p>动态配置服务</p>
-<p>Nacos支持动态的配置管理，将服务的配置信息分环境分类别外部管理，并且支持热更新。不过与Config不同Nacos的配置信息存储与数据库中，支持配置信息的监听和版本回滚。</p>
-<p><img src="/images/Nacos/2.png" alt="avatar"></p>
-</li>
-<li><p>动态DNS服务</p>
-<p>支持权重路由，更容易地实现中间层负载均衡、更灵活的路由策略、流量控制以及数据中心内网的简单DNS解析服务。不过这个特性目前版本还不支持。</p>
-</li>
-<li><p>服务及元数据管理</p>
-<p>Nacos 能让您从微服务平台建设的视角管理数据中心的所有服务及元数据，包括管理服务的描述、生命周期、服务的静态依赖分析、服务的健康状态、服务的流量管理、路由及安全策略、服务的 SLA 以及最首要的 metrics 统计数据。</p>
-</li>
+    <title>单点登录（一）</title>
+    <url>/2020/06/01/ckb0khpqp0000twvjceb1c0fy/</url>
+    <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>在分布式环境中，存在多个子系统，每个子系统独立部署。当用户登录其中一个系统之后，若需要访问另一个系统，使用传统方式session的话，就需要用户登录，一旦子系统数量众多，那么用户则需要在多个系统中进行登录，用户体验相当差。</p>
+<a id="more"></a>
+
+<h3 id="解决方式"><a href="#解决方式" class="headerlink" title="解决方式"></a>解决方式</h3><p>单点登录（Single Sign On），简称为 SSO，是目前比较流行的企业业务整合的解决方案之一。SSO 的定义是在多个应用系统中，用户只需要登录一次就可以访问所有相互信任的应用系统。</p>
+<h4 id="同域下的单点登录"><a href="#同域下的单点登录" class="headerlink" title="同域下的单点登录"></a>同域下的单点登录</h4><p>一个企业一般情况下只有一个域名，通过二级域名区分不同的系统。比如我们有个域名叫做：a.com，同时有两个业务系统分别为：app1.a.com和app2.a.com。我们要做单点登录（SSO），需要一个登录系统，叫sso.a.com。</p>
+<p>我们只要在sso.a.com登录，app1.a.com和app2.a.com就也登录了。通过上面的登陆认证机制，我们可以知道，在sso.a.com中登录了，其实是在sso.a.com的服务端的session中记录了登录状态，同时在浏览器端（Browser）的sso.a.com下写入了Cookie。那么我们怎么才能让app1.a.com和app2.a.com登录呢？这里有两个问题：</p>
+<ul>
+<li>Cookie是不能跨域的，认证系统中Cookie的domain属性是sso.a.com，在给app1.a.com和app2.a.com发送请求是带不上的。<strong>在设置Cookie的时候，其domain的值只能是当前域名或者顶级域名，不能设置为其他域名</strong></li>
+<li>sso、app1和app2是不同的应用，它们的session存在自己的应用内，是不共享的。</li>
 </ul>
-<h3 id="生态"><a href="#生态" class="headerlink" title="生态"></a>生态</h3><p>除了对于阿里开源生态体系如 Dubbo 等自身的支持，也非常强调融入其它的开源生态，这里就包括 Java 的微服务生态体系 Spring Cloud，Kubernetes/CNCF 云原生生态体系。</p>
-<p>Nacos 无缝支持 Spring Cloud，为 Spring Cloud 用户其提供更简便的配置中心和注册中心的解决方案。</p>
-<p>Nacos支持目前几乎所有主流的微服务生态体系。</p>
-<p><img src="/images/Nacos/3.jpg" alt="avatar"></p>
-<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>文章参考LarsCheng的<a href="https://blog.csdn.net/qq_33619378/category_9291906.html" target="_blank" rel="noopener">Nacos从入门到避坑</a>进行整理</p>
-<hr>
-<h3 id="注册中心示例"><a href="#注册中心示例" class="headerlink" title="注册中心示例"></a><a name="register">注册中心示例</a></h3><h4 id="关系描述"><a href="#关系描述" class="headerlink" title="关系描述"></a>关系描述</h4><ul>
-<li><p>nacos-provider：服务提供者</p>
-</li>
-<li><p>nacos-consumer：服务消费者</p>
-<p><img src="/images/Nacos/4.jpg" alt="avatar"></p>
-</li>
+<p><img src="/images/sso/2.png" alt="avatar"></p>
+<p>解决上述两问题的方法：</p>
+<ul>
+<li>sso登录之后，把Cookie的domain属性设置到顶级域名a.com下，所有子系统都可以访问顶级域名的Cookie了。</li>
+<li>将sso、app1、app2这三个系统的session进行共享，可以通过spring-session进行实现</li>
 </ul>
+<h4 id="不同域下的单点登录"><a href="#不同域下的单点登录" class="headerlink" title="不同域下的单点登录"></a>不同域下的单点登录</h4><p>同域下的单点登录是巧用了Cookie和Session共享来实现的，那么在不同域名的情况下，各个系统之间要实现单点登录，那么就需要采用CAS的方式。</p>
+<p>CAS 是 Yale 大学发起的一个开源项目，旨在为 Web 应用系统提供一种可靠的单点登录方法，CAS 在 2004 年 12 月正式成为 JA-SIG 的一个项目。CAS 具有以下特点：</p>
+<ul>
+<li>开源的企业级单点登录解决方案。</li>
+<li>CAS Server 为需要独立部署的 Web 应用。这个CAS框架已经提供</li>
+<li>CAS Client 支持非常多的客户端(这里指单点登录系统中的各个 Web 应用)，包括Java, .Net, PHP, Perl, Apache, uPortal, Ruby 等。</li>
+</ul>
+<p>从结构上看，CAS 包含两个部分： CAS Server 和 CAS Client。CAS Server 需要独立部署，主要负责对用户的认证工作；CAS Client 负责处理对客户端受保护资源的访问请求，需要登录时，重定向到 CAS Server。</p>
+<p>流程图：</p>
+<p><img src="/images/sso/1.png" alt="avatar"></p>
+<p>流程简述：</p>
 <ol>
-<li>将provider和consumer注册到nacos-server</li>
-<li>consumer通过主动轮询获取他所订阅消费的服务信息列表</li>
-<li>consumer根据获取的服务信息列表，进行服务调用</li>
+<li>用户访问app系统，app系统是需要登录的，但用户现在没有登录。</li>
+<li>跳转到CAS server，即SSO登录系统，<strong>以后图中的CAS Server我们统一叫做SSO系统。</strong> SSO系统也没有登录，弹出用户登录页。</li>
+<li>用户填写用户名、密码，SSO系统进行认证后，将登录状态写入SSO的session，浏览器（Browser）中写入SSO域下的Cookie。</li>
+<li>SSO系统登录完成后会生成一个ST（Service Ticket），然后跳转到app系统，同时将ST作为参数传递给app系统。</li>
+<li>app系统拿到ST后，从后台向SSO发送请求，验证ST是否有效。</li>
+<li>验证通过后，app系统将登录状态写入session并设置app域下的Cookie。</li>
 </ol>
-<h4 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h4><ul>
-<li>Windows10</li>
-<li>JDK8</li>
-<li>SpringCloudAlibaba: 2.2.1.RELEASE</li>
-<li>SpringBoot: 2.2.7.RELEASE</li>
-<li>Nacos-server: 1.2.1</li>
-</ul>
-<p><em>Nacos针对不同版本的SpringCloud的依赖，可以参看官方提供的依赖信息 <a href="[https://github.com/alibaba/spring-cloud-alibaba/wiki/%E7%89%88%E6%9C%AC%E8%AF%B4%E6%98%8E](https://github.com/alibaba/spring-cloud-alibaba/wiki/版本说明)">版本说明</a></em></p>
-<h4 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h4><ul>
-<li><p>Nacos下载和启动</p>
-<ul>
-<li><p>Git官网下载nacos-1.2.1的压缩包 <a href="https://github.com/alibaba//images/nacos/releases">github</a></p>
-</li>
-<li><p>下载解压后进入<code>bin</code>文件夹，双击执行startup.cmd文件，启动后控制台输出如下：</p>
-<p><img src="/images/Nacos/5.png" alt="avatar"></p>
-</li>
-<li><p>启动城中后，就可以访问Nacos的图形化界面控制台，浏览器访问地址：<a href="http://127.0.0.1:8848//images/nacos/index.html" target="_blank" rel="noopener">http://127.0.0.1:8848//images/nacos/index.html</a> , 默认的账号密码为/images/nacos/nacos</p>
-</li>
-</ul>
-</li>
-</ul>
-<pre><code>![avatar](/images/Nacos/1.png)</code></pre><ul>
-<li><p>项目构建</p>
-<ul>
-<li><p>项目结构</p>
-<p><img src="/images/Nacos/6.png" alt="avatar"></p>
-</li>
-<li><p>IDEA中创建聚合工程nacos作为父工程，其pom.xml如下</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">project</span> <span class="attr">xmlns</span>=<span class="string">"http://maven.apache.org/POM/4.0.0"</span> <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">	<span class="attr">xsi:schemaLocation</span>=<span class="string">"http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">packaging</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">packaging</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">modules</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">module</span>&gt;</span>register<span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">modules</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">parent</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-parent<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">version</span>&gt;</span>2.2.7.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">relativePath</span>/&gt;</span> <span class="comment">&lt;!-- lookup parent from repository --&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">parent</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.david4it<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>nacos<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">version</span>&gt;</span>0.0.1-SNAPSHOT<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">name</span>&gt;</span>nacos<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">description</span>&gt;</span>Basic use of Nacos<span class="tag">&lt;/<span class="name">description</span>&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="tag">&lt;<span class="name">properties</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">java.version</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">java.version</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">spring-cloud-alibaba.version</span>&gt;</span>2.2.1.RELEASE<span class="tag">&lt;/<span class="name">spring-cloud-alibaba.version</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">properties</span>&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.projectlombok<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>lombok<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">optional</span>&gt;</span>true<span class="tag">&lt;/<span class="name">optional</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-alibaba-nacos-config<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line">		<span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-test<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">scope</span>&gt;</span>test<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">exclusions</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;<span class="name">exclusion</span>&gt;</span></span><br><span class="line">					<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.junit.vintage<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">					<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>junit-vintage-engine<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;/<span class="name">exclusion</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;/<span class="name">exclusions</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 引入alibaba的依赖 --&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">dependencyManagement</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-alibaba-dependencies<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;spring-cloud-alibaba.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;<span class="name">type</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;<span class="name">scope</span>&gt;</span>import<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">dependencyManagement</span>&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>register为注册中心部分的演示，其pom.xml添加对注册服务发现的依赖</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">project</span> <span class="attr">xmlns</span>=<span class="string">"http://maven.apache.org/POM/4.0.0"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parent</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>nacos<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.david4it<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.0.1-SNAPSHOT<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">parent</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>register<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">packaging</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">packaging</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">modules</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span>&gt;</span>nacos-provider<span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span>&gt;</span>nacos-consumer<span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">modules</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-alibaba-nacos-discovery<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>provider相关配置信息</p>
+<p>至此，跨域单点登录就完成了。以后我们再访问app系统时，app就是登录的。接下来，我们再看看访问app2系统时的流程。</p>
 <ol>
-<li><p>编写rest api</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ProviderController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GetMapping</span>(<span class="string">"/helloNacos"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">helloNacos</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"你好，nacos！"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>启动项配置服务发现的annotation</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//开启服务发现</span></span><br><span class="line"><span class="meta">@EnableDiscoveryClient</span></span><br><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NacosProviderApplication</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">		SpringApplication.run(NacosProviderApplication<span class="class">.<span class="keyword">class</span>, <span class="title">args</span>)</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>application.yml进行注册中心的配置</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">8088</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">provider</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">discovery:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br></pre></td></tr></table></figure>
-</li>
+<li>用户访问app2系统，app2系统没有登录，跳转到SSO。</li>
+<li>由于SSO已经登录了，不需要重新登录认证。</li>
+<li>SSO生成ST，浏览器跳转到app2系统，并将ST作为参数传递给app2。</li>
+<li>app2拿到ST，后台访问SSO，验证ST是否有效。</li>
+<li>验证成功后，app2将登录状态写入session，并在app2域下写入Cookie。</li>
 </ol>
-</li>
-<li><p>consumer相关配置</p>
-<ol>
-<li><p>编写rest api 对provider的服务进行访问</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConsumerController</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    RestTemplate restTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GetMapping</span>(<span class="string">"/consumer/restTemplate"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">consumer_restTemplate</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> restTemplate.getForObject(<span class="string">"http://provider/helloNacos"</span>, String<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>启动项配置服务发现的annotation</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//开启服务发现</span></span><br><span class="line"><span class="meta">@EnableDiscoveryClient</span></span><br><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NacosConsumerApplication</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">		SpringApplication.run(NacosConsumerApplication<span class="class">.<span class="keyword">class</span>, <span class="title">args</span>)</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Bean</span></span><br><span class="line">	<span class="meta">@LoadBalanced</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> RestTemplate <span class="title">restTemplate</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> RestTemplate();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>application.yml进行注册中心的配置</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">9099</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">consumer</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">discovery:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br></pre></td></tr></table></figure>
-
-
-
-</li>
-</ol>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h4 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h4><ol>
-<li><p>Nacos控制台查看consumer和provider服务</p>
-<p><img src="/images/Nacos/7.png" alt="avatar"></p>
-</li>
-<li><p>consumer访问provider的接口</p>
-<p><a href="http://localhost:9099/consumer/restTemplate" target="_blank" rel="noopener">http://localhost:9099/consumer/restTemplate</a>  页面返回：你好，nacos！</p>
-</li>
-</ol>
-<p>本文源码：<a href="https://github.com/david4It/nacos">github</a></p>
-<hr>
-<h3 id="OpenFeign集成"><a href="#OpenFeign集成" class="headerlink" title="OpenFeign集成"></a>OpenFeign集成</h3><p>基于<em><a href="#register">注册中心示例</a></em> ，可以将restTemplate的访问替换为更加优雅的OpenFeign的访问方式</p>
-<h4 id="关系描述-1"><a href="#关系描述-1" class="headerlink" title="关系描述"></a>关系描述</h4><ul>
-<li>nacos-consumer-feign：服务消费者的OpenFeign版本</li>
-</ul>
-<h4 id="环境-1"><a href="#环境-1" class="headerlink" title="环境"></a>环境</h4><ul>
-<li>Windows10</li>
-<li>JDK8</li>
-<li>SpringCloudAlibaba: 2.2.1.RELEASE</li>
-<li>SpringBoot: 2.2.7.RELEASE</li>
-<li>Nacos-server: 1.2.1</li>
-</ul>
-<ul>
-<li>spring-cloud-dependencies: Hoxton.SR4</li>
-</ul>
-<h4 id="步骤-1"><a href="#步骤-1" class="headerlink" title="步骤"></a>步骤</h4><ul>
-<li><p>新建Module，取名为nacos-consumer-feign，在pom.xml中需要添加对spring-cloud的相关依赖</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="string">&lt;?xml</span> <span class="string">version="1.0"</span> <span class="string">encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="string">&lt;project</span> <span class="string">xmlns="http://maven.apache.org/POM/4.0.0"</span></span><br><span class="line">         <span class="string">xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"</span></span><br><span class="line">         <span class="string">xsi:schemaLocation="http://maven.apache.org/POM/4.0.0</span> <span class="string">http://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;</span></span><br><span class="line">    <span class="string">&lt;parent&gt;</span></span><br><span class="line">        <span class="string">&lt;artifactId&gt;register&lt;/artifactId&gt;</span></span><br><span class="line">        <span class="string">&lt;groupId&gt;com.david4it&lt;/groupId&gt;</span></span><br><span class="line">        <span class="string">&lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;</span></span><br><span class="line">    <span class="string">&lt;/parent&gt;</span></span><br><span class="line">    <span class="string">&lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="string">&lt;artifactId&gt;nacos-consumer-feign&lt;/artifactId&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="string">&lt;properties&gt;</span></span><br><span class="line">        <span class="string">&lt;spring-cloud.version&gt;Hoxton.SR4&lt;/spring-cloud.version&gt;</span></span><br><span class="line">    <span class="string">&lt;/properties&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="string">&lt;dependencies&gt;</span></span><br><span class="line">        <span class="string">&lt;dependency&gt;</span></span><br><span class="line">            <span class="string">&lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</span></span><br><span class="line">            <span class="string">&lt;artifactId&gt;spring-cloud-starter-openfeign&lt;/artifactId&gt;</span></span><br><span class="line">        <span class="string">&lt;/dependency&gt;</span></span><br><span class="line">    <span class="string">&lt;/dependencies&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="string">&lt;dependencyManagement&gt;</span></span><br><span class="line">        <span class="string">&lt;dependencies&gt;</span></span><br><span class="line">            <span class="string">&lt;dependency&gt;</span></span><br><span class="line">                <span class="string">&lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</span></span><br><span class="line">                <span class="string">&lt;artifactId&gt;spring-cloud-dependencies&lt;/artifactId&gt;</span></span><br><span class="line">                <span class="string">&lt;version&gt;$&#123;spring-cloud.version&#125;&lt;/version&gt;</span></span><br><span class="line">                <span class="string">&lt;type&gt;pom&lt;/type&gt;</span></span><br><span class="line">                <span class="string">&lt;scope&gt;import&lt;/scope&gt;</span></span><br><span class="line">            <span class="string">&lt;/dependency&gt;</span></span><br><span class="line">        <span class="string">&lt;/dependencies&gt;</span></span><br><span class="line">    <span class="string">&lt;/dependencyManagement&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="string">&lt;/project&gt;</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>application.yml配置文件</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">7077</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">consumer-feign</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">config:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>远程接口调用</strong></p>
-<ul>
-<li><p>启动类添加@EnableFeignClients注解</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@EnableDiscoveryClient</span></span><br><span class="line"><span class="meta">@EnableFeignClients</span></span><br><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NacosConsumerFeignApplication</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SpringApplication.run(NacosConsumerFeignApplication<span class="class">.<span class="keyword">class</span>, <span class="title">args</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-</li>
-</ul>
-</li>
-</ul>
-<ul>
-<li><p>编写feign的接口类</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//name表示Nacos上注册的服务名</span></span><br><span class="line"><span class="comment">//fallback表示当此接口调用失败之后，调用此接口的实现类用来进行远程调用的熔断和降级处理</span></span><br><span class="line"><span class="meta">@FeignClient</span>(name = <span class="string">"provider"</span>, fallback = RemoteClientHystrix<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class"><span class="title">public</span> <span class="title">interface</span> <span class="title">RemoteClient</span> </span>&#123;</span><br><span class="line">    <span class="meta">@GetMapping</span>(<span class="string">"/helloNacos"</span>)</span><br><span class="line">    <span class="function">String <span class="title">helloNacos</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-</li>
-</ul>
-<ul>
-<li><p>编写RemoteClientHystrix</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RemoteClientHystrix</span> <span class="keyword">implements</span> <span class="title">RemoteClient</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">helloNacos</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"请求超时"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>rest api定义对远程方法的调用</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CustomerController</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">public</span> RemoteClient remoteClient;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GetMapping</span>(<span class="string">"/consumer/feign"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">consumer_feign</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> remoteClient.helloNacos();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-</li>
-</ul>
-<h4 id="测试-1"><a href="#测试-1" class="headerlink" title="测试"></a>测试</h4><p>启动nacos-consumer-feign项目，在nacos控制台中可以看到此服务已经启动完成，在浏览器中输入<a href="http://localhost:7077/consumer/feign" target="_blank" rel="noopener">http://localhost:7077/consumer/feign</a> 进行访问，页面返回内容：你好，nacos！</p>
-<p>OpenFegin整合Ribbon和Hystrix，为微服务中远程调用提供了一种更优雅的调用方式，它支持负载均衡和容错熔断机制。</p>
-<p>本文源码：<a href="https://github.com/david4It/nacos">github</a></p>
-<hr>
-<h3 id="Nacos配置中心"><a href="#Nacos配置中心" class="headerlink" title="Nacos配置中心"></a>Nacos配置中心</h3><h4 id="Nacos配置规则"><a href="#Nacos配置规则" class="headerlink" title="Nacos配置规则"></a>Nacos配置规则</h4><p>在Nacos-Server中新建配置，其中Data ID它的定义规则是：<code>${prefix}-${spring.profile.active}.${file-extension}</code></p>
-<ul>
-<li>prefix 默认为 <code>spring.application.name</code> 的值，也可以通过配置项 <code>spring.cloud.nacos.config.prefix</code>来配置。</li>
-<li><code>spring.profile.active</code> 即为当前环境对应的 profile，可以通过配置项 <code>spring.profile.active</code> 来配置。</li>
-<li><code>file-exetension</code> 为配置内容的数据格式，可以通过配置项<code>spring.cloud.nacos.config.file-extension</code>来配置。目前只支持 properties 和 yaml 类型。</li>
-<li>当<code>spring.profile.active</code> 为空时，对应的连接符 - 也将不存在，data Id 的拼接格式变成 <code>prefix.{prefix}.prefix.{file-extension}</code></li>
-</ul>
-<p>在Nacos新建配置如下：</p>
-<p><img src="/images/Nacos/8.png" alt="avatar"></p>
-<h4 id="环境-2"><a href="#环境-2" class="headerlink" title="环境"></a>环境</h4><ul>
-<li>Windows10</li>
-<li>JDK8</li>
-<li>SpringCloudAlibaba: 2.2.1.RELEASE</li>
-<li>SpringBoot: 2.2.7.RELEASE</li>
-<li>Nacos-server: 1.2.1</li>
-</ul>
-<h4 id="步骤-2"><a href="#步骤-2" class="headerlink" title="步骤"></a>步骤</h4><ul>
-<li><p>新建Module，取名为config</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">project</span> <span class="attr">xmlns</span>=<span class="string">"http://maven.apache.org/POM/4.0.0"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parent</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>nacos<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.david4it<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.0.1-SNAPSHOT<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">parent</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>config<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">packaging</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">packaging</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">modules</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span>&gt;</span>nacos-config<span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">modules</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-alibaba-nacos-discovery<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>在config的Module中创建一个名为nacos-config的Module</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">project</span> <span class="attr">xmlns</span>=<span class="string">"http://maven.apache.org/POM/4.0.0"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parent</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>config<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.david4it<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.0.1-SNAPSHOT<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">parent</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>nacos-config<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>新建 <strong><em>bootstrap.yml</em></strong>，这里要注意是bootstrap而不是application，Nacos同springcloud-config一样，在项目初始化时，要保证先从配置中心进行配置拉取，拉取配置之后，才能保证项目的正常启动。springboot中配置文件的加载是存在优先级顺序的，bootstrap优先级高于application</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">6066</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">nacos-config</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">discovery:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br><span class="line">        <span class="comment"># config.server-addr:配置中心的位置</span></span><br><span class="line">        <span class="comment"># config.file-extension:配置文件的格式</span></span><br><span class="line">      <span class="attr">config:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br><span class="line">        <span class="attr">file-extension:</span> <span class="string">yml</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>启动类</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@EnableDiscoveryClient</span></span><br><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NacosConfigApplication</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SpringApplication.run(NacosConfigApplication<span class="class">.<span class="keyword">class</span>, <span class="title">args</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>rest api访问配置项</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="comment">//@RefreshScope注解，可以使当前类下的配置支持动态更新。</span></span><br><span class="line"><span class="meta">@RefreshScope</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConfigController</span> </span>&#123;</span><br><span class="line">    <span class="comment">//使用@Value对配置进行读取</span></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;nacos.config&#125;"</span>)</span><br><span class="line">    <span class="keyword">public</span> String config;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"/config/value"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getConfig</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> config;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-</li>
-</ul>
-<h4 id="测试-2"><a href="#测试-2" class="headerlink" title="测试"></a>测试</h4><p>项目启动之后，在nacos控制台中可以看到此服务已经启动完成。在浏览器中访问<a href="http://localhost:6066/config/value" target="_blank" rel="noopener">http://localhost:6066/config/value</a> ，可以看到浏览器返回：value from nacos config server 。表明已经成功从nacos配置中心读取到了配置数据。在nacos配置中心修改nacos.config的值，再刷新浏览器，可以看到浏览器返回的值同步发生了变化。</p>
-<p>本文源码：<a href="https://github.com/david4It/nacos">github</a></p>
-<hr>
-<h3 id="Nacos多环境配置中心"><a href="#Nacos多环境配置中心" class="headerlink" title="Nacos多环境配置中心"></a>Nacos多环境配置中心</h3><h4 id="环境-3"><a href="#环境-3" class="headerlink" title="环境"></a>环境</h4><ul>
-<li>Windows10</li>
-<li>JDK8</li>
-<li>SpringCloudAlibaba: 2.2.1.RELEASE</li>
-<li>SpringBoot: 2.2.7.RELEASE</li>
-<li>Nacos-server: 1.2.1</li>
-</ul>
-<h4 id="步骤-3"><a href="#步骤-3" class="headerlink" title="步骤"></a>步骤</h4><h5 id="Data-ID-配置方式"><a href="#Data-ID-配置方式" class="headerlink" title="Data ID 配置方式"></a>Data ID 配置方式</h5><p>命名规则为：<code>${prefix}-${spring.profile.active}.${file-extension}</code></p>
-<p>通过其中的<code>spring.profile.active</code>属性即可进行多环境下配置文件的读取</p>
-<ul>
-<li><p>启动Nacos，创建nacos-config-dataid-dev.yml，其中yml的内容如下</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line">    <span class="attr">port:</span> <span class="number">9123</span></span><br><span class="line"><span class="attr">nacos:</span></span><br><span class="line">    <span class="attr">config:</span> <span class="string">message</span> <span class="string">from</span> <span class="string">nacos-config-dataid-dev.yml</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>启动Nacos，创建nacos-config-dataid-pro.yml，其中yml的内容如下</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">server:</span><br><span class="line">    port: 9124</span><br><span class="line">nacos:</span><br><span class="line">    config: message from nacos-config-dataid-pro.yml</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>新建Module，取名为nacos-config-dataid，项目结构如下</p>
-<p><img src="/source/images//images/nacos/9.png" alt="avatar"></p>
-</li>
-<li><p>nacos-config-dataid项目中新建bootsrap.yml，内容如下</p>
-<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">discovery:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br><span class="line">      <span class="attr">config:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br><span class="line">        <span class="attr">file-extension:</span> <span class="string">yml</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">nacos-config-dataid</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>启动项</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@EnableDiscoveryClient</span></span><br><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NacosConfigDataIdApplication</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SpringApplication.run(NacosConfigDataIdApplication<span class="class">.<span class="keyword">class</span>, <span class="title">args</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>定义配置访问接口</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RefreshScope</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConfigController</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;nacos.config&#125;"</span>)</span><br><span class="line">    <span class="keyword">public</span> String config;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"/config/value"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getConfig</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> config;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>IDEA启动的时候，配置使用dev的环境</p>
-<p><img src="/source/images//images/nacos/10.png" alt="avatar"></p>
-</li>
-<li><p>启动项目，在控制台看到项目启动的端口为9123，证明已经读取到nacos的配置文件</p>
-<figure class="highlight verilog"><table><tr><td class="code"><pre><span class="line"><span class="number">2020</span>-<span class="number">05</span>-<span class="number">28</span> <span class="number">14</span>:<span class="number">34</span>:<span class="number">05</span><span class="variable">.466</span>  INFO <span class="number">1336</span> --- [           main] o<span class="variable">.s</span><span class="variable">.s</span><span class="variable">.c</span><span class="variable">.ThreadPoolTaskScheduler</span>          : Initializing ExecutorService 'Nacso-Watch-Task-Scheduler'</span><br><span class="line"><span class="number">2020</span>-<span class="number">05</span>-<span class="number">28</span> <span class="number">14</span>:<span class="number">34</span>:<span class="number">05</span><span class="variable">.470</span>  INFO <span class="number">1336</span> --- [           main] com<span class="variable">.alibaba</span><span class="variable">.nacos</span><span class="variable">.client</span><span class="variable">.naming</span>          : initializer namespace from System Property :<span class="literal">null</span></span><br><span class="line"><span class="number">2020</span>-<span class="number">05</span>-<span class="number">28</span> <span class="number">14</span>:<span class="number">34</span>:<span class="number">05</span><span class="variable">.470</span>  INFO <span class="number">1336</span> --- [           main] com<span class="variable">.alibaba</span><span class="variable">.nacos</span><span class="variable">.client</span><span class="variable">.naming</span>          : initializer namespace from System Environment :<span class="literal">null</span></span><br><span class="line"><span class="number">2020</span>-<span class="number">05</span>-<span class="number">28</span> <span class="number">14</span>:<span class="number">34</span>:<span class="number">05</span><span class="variable">.471</span>  INFO <span class="number">1336</span> --- [           main] com<span class="variable">.alibaba</span><span class="variable">.nacos</span><span class="variable">.client</span><span class="variable">.naming</span>          : initializer namespace from System Property :<span class="literal">null</span></span><br><span class="line"><span class="number">2020</span>-<span class="number">05</span>-<span class="number">28</span> <span class="number">14</span>:<span class="number">34</span>:<span class="number">05</span><span class="variable">.794</span>  INFO <span class="number">1336</span> --- [           main] o<span class="variable">.s</span><span class="variable">.b</span><span class="variable">.w</span><span class="variable">.embedded</span><span class="variable">.tomcat</span><span class="variable">.TomcatWebServer</span>  : Tomcat started on port(s): <span class="number">9123</span> (http) <span class="keyword">with</span> <span class="keyword">context</span> path ''</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>访问 <a href="http://127.0.0.1:9123/config/value" target="_blank" rel="noopener">http://127.0.0.1:9123/config/value</a> 页面返回信息：message from nacos-config-dataid-dev.yml</p>
-</li>
-<li><p>更换IDEA的启动环境为pro，再启动程序，在控制台看到项目启动端口已经变成9124，再访问 <a href="http://127.0.0.1:9124/config/value" target="_blank" rel="noopener">http://127.0.0.1:9124/config/value</a> 页面返回信息：message from nacos-config-dataid-pro.yml</p>
-</li>
-</ul>
-<h5 id="Group配置方式"><a href="#Group配置方式" class="headerlink" title="Group配置方式"></a>Group配置方式</h5><p>仅适用Group配置方式没有dataid配置方式灵活，因为每次都要修改yml内的配置，才能使其生效；通常在多环境部署中，都是通过修改spring.profile.acitve来实现环境的切换，这样不需要修改配置文件，只需要在启动的时候通过参数进行指定即可。</p>
-<p>官方推荐Group配置使用方式是和namespace结合使用，<strong>不建议单独使用group配置方式</strong></p>
-<ul>
-<li><p>启动Nacos，创建nacos-config-group.yml，其中的GROUP指定为DEV</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line">    <span class="attr">port:</span> <span class="number">9001</span></span><br><span class="line"><span class="attr">nacos:</span></span><br><span class="line">    <span class="attr">config:</span> <span class="string">message</span> <span class="string">from</span> <span class="string">DEV</span> <span class="string">group</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>启动Nacos，创建nacos-config-group.yml，其中的GROUP指定为PRO</p>
-<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line">    <span class="attr">port:</span> <span class="number">9002</span></span><br><span class="line"><span class="attr">nacos:</span></span><br><span class="line">    <span class="attr">config:</span> <span class="string">message</span> <span class="string">from</span> <span class="string">PRO</span> <span class="string">group</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>新建module，取名为nacos-config-group，新建bootstrap.yml，内容如下</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">nacos-config-group</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">config:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br><span class="line">        <span class="attr">file-extension:</span> <span class="string">yml</span></span><br><span class="line">        <span class="attr">group:</span> <span class="string">DEV</span></span><br><span class="line">      <span class="attr">discovery:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>其余的配置和nacos-config-dataid项目一致，这里就不再赘述</p>
-</li>
-<li><p>项目启动后，可以在控制台看到启动的端口为9001，访问 <a href="http://127.0.0.1:9001/config/value" target="_blank" rel="noopener">http://127.0.0.1:9001/config/value</a> 页面返回message from DEV group；修改bootstrap.yml文件，把group改为PRO，启动后的端口就变成了9002，访问 <a href="http://127.0.0.1:9002/config/value" target="_blank" rel="noopener">http://127.0.0.1:9002/config/value</a> 页面返回message from PRO group</p>
-</li>
-</ul>
-<h5 id="NameSpace配置方式"><a href="#NameSpace配置方式" class="headerlink" title="NameSpace配置方式"></a>NameSpace配置方式</h5><p>Namespace命名空间进行环境隔离也是官方推荐的一种方式。Namespace的常用场景之一是不同环境的配置的区分隔离，例如：开发测试环境和生产环境的资源（如配置、服务）隔离等。</p>
-<ul>
-<li><p>在Nacos中创建两个命名空间，分别为DEV和PRO</p>
-<p><img src="/source/images//images/nacos/11.png" alt="avatar"></p>
-</li>
-<li><p>在配置列表中，可以看到新增的两个命名空间DEV和PRO，系统默认的命名空间是public</p>
-<p><img src="/source/images//images/nacos/12.png" alt="avatar"></p>
-</li>
-<li><p>在DEV中新建配置，取名为nacos-config-namespace.yml</p>
-<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line">    <span class="attr">port:</span> <span class="number">9901</span></span><br><span class="line"><span class="attr">nacos:</span></span><br><span class="line">    <span class="attr">config:</span> <span class="string">message</span> <span class="string">from</span> <span class="string">DEV</span> <span class="string">namespace</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>在PRO中新建配置，取名为nacos-config-namespace.yml</p>
-<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line">    <span class="attr">port:</span> <span class="number">9902</span></span><br><span class="line"><span class="attr">nacos:</span></span><br><span class="line">    <span class="attr">config:</span> <span class="string">message</span> <span class="string">from</span> <span class="string">PRO</span> <span class="string">namespace</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>新建module，取名为nacos-config-namespace，新建bootstrap.yml，namespace为命名空间的uuid</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">nacos-config-namespace</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">discovery:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br><span class="line">      <span class="attr">config:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br><span class="line">        <span class="attr">prefix:</span> <span class="string">$&#123;spring.application.name&#125;</span></span><br><span class="line">        <span class="attr">file-extension:</span> <span class="string">yml</span></span><br><span class="line">        <span class="attr">namespace:</span> <span class="string">3968f85b-b9d4-4cb3-bcd5-19b24c728571</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>其余的配置和nacos-config-dataid项目一致，这里就不再赘述</p>
-</li>
-<li><p>项目启动后，可以在控制台看到启动的端口为9901，访问 <a href="http://127.0.0.1:9901/config/value" target="_blank" rel="noopener">http://127.0.0.1:9901/config/value</a> 页面返回message from DEV namespace；修改bootstrap.yml文件，把namespace的值改为PRO命名空间的uuid，启动后的端口就变成了9902，访问 <a href="http://127.0.0.1:9902/config/value" target="_blank" rel="noopener">http://127.0.0.1:9902/config/value</a> 页面返回message from PRO namespace</p>
-</li>
-</ul>
-<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ul>
-<li>DataID: 适用于项目不多，服务量少的情况。</li>
-<li>Group：实现方式简单，但是容易与DataID方案发生冲突，仅适合于本地调试</li>
-<li>Namespace：实现方式简单，配置管理简单灵活，同时可以结合DataID共同使用，推荐这种方案</li>
-</ul>
-<p>本文源码：<a href="https://github.com/david4It/nacos">github</a></p>
-<hr>
+<p>这样，app2系统不需要走登录流程，就已经是登录了。SSO，app和app2在不同的域，它们之间的session不共享也是没问题的。</p>
 ]]></content>
+      <categories>
+        <category>CAS</category>
+      </categories>
+      <tags>
+        <tag>CAS</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>单点登录（三）</title>
+    <url>/2020/06/03/ckb0khpr90007twvjc15xboq3/</url>
+    <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>CAS Server的基本定制已经完成，接下来就需要对Client进行开发和测试，保证整个业务流程的正确性。这里通过两个client项目进行演示：其中一个项目使用filter方式进行认证；而另一个项目则采用spring security cas的方式进行认证。</p>
+<a id="more"></a>
+
+<h3 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h3><ol>
+<li>JDK1.8</li>
+<li>Intellij Idea</li>
+<li>Spring boot 2.3.0 + thymeleaf + spring security</li>
+<li><a href="https://github.com/apereo/java-cas-client/releases/tag/cas-client-3.6.0" target="_blank" rel="noopener">cas client 3.6.0</a></li>
+<li>maven 3.6.1</li>
+</ol>
+<h3 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h3><h4 id="SpringBoot-Filter-方式"><a href="#SpringBoot-Filter-方式" class="headerlink" title="SpringBoot + Filter 方式"></a>SpringBoot + Filter 方式</h4><ul>
+<li><p>添加cas-client的springboot依赖</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.jasig.cas.client<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>cas-client-support-springboot<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;java.cas.client.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<ul>
+<li><p>yml文件添加如下配置，以便Filters初始化的时候进行使用</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">cas:</span></span><br><span class="line">  <span class="attr">server-url-prefix:</span> <span class="string">https://david4it.com:8443/cas</span></span><br><span class="line">  <span class="attr">server-login-url:</span> <span class="string">https://david4it.com:8443/cas/login</span></span><br><span class="line">  <span class="attr">client-host-url:</span> <span class="string">http://picClient.com:8088</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>添加CAS Filters</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CASAutoConfig</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;cas.server-url-prefix&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> String serverUrlPrefix;</span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;cas.server-login-url&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> String serverLoginUrl;</span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;cas.client-host-url&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> String clientHostUrl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 登录过滤器:执行用户退出时的操作（可选）</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> FilterRegistrationBean <span class="title">filterSingleRegistration</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        FilterRegistrationBean registration = <span class="keyword">new</span> FilterRegistrationBean();</span><br><span class="line">        registration.setFilter(<span class="keyword">new</span> SingleSignOutFilter());</span><br><span class="line">        <span class="comment">// 设定匹配的路径</span></span><br><span class="line">        registration.addUrlPatterns(<span class="string">"/*"</span>);</span><br><span class="line">        <span class="comment">// 设定加载的顺序</span></span><br><span class="line">        registration.setOrder(<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> registration;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * ticket过滤验证器:负责检验ticket（必须）</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> FilterRegistrationBean <span class="title">filterValidationRegistration</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        FilterRegistrationBean registration = <span class="keyword">new</span> FilterRegistrationBean();</span><br><span class="line">        registration.setFilter(<span class="keyword">new</span> Cas30ProxyReceivingTicketValidationFilter());</span><br><span class="line">        <span class="comment">// 设定匹配的路径</span></span><br><span class="line">        registration.addUrlPatterns(<span class="string">"/*"</span>);</span><br><span class="line">        Map&lt;String,String&gt;  initParameters = <span class="keyword">new</span> HashMap&lt;String, String&gt;();</span><br><span class="line">        initParameters.put(<span class="string">"casServerUrlPrefix"</span>, serverUrlPrefix);</span><br><span class="line">        initParameters.put(<span class="string">"serverName"</span>, clientHostUrl);</span><br><span class="line">        initParameters.put(<span class="string">"useSession"</span>, <span class="string">"true"</span>);</span><br><span class="line">        registration.setInitParameters(initParameters);</span><br><span class="line">        <span class="comment">// 设定加载的顺序</span></span><br><span class="line">        registration.setOrder(<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> registration;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 授权过滤器:负责用户认证（必须）</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> FilterRegistrationBean <span class="title">filterAuthenticationRegistration</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        FilterRegistrationBean registration = <span class="keyword">new</span> FilterRegistrationBean();</span><br><span class="line">        registration.setFilter(<span class="keyword">new</span> AuthenticationFilter());</span><br><span class="line">        <span class="comment">// 设定匹配的路径</span></span><br><span class="line">        registration.addUrlPatterns(<span class="string">"/*"</span>);</span><br><span class="line">        Map&lt;String,String&gt; initParameters = <span class="keyword">new</span> HashMap&lt;String, String&gt;();</span><br><span class="line">        initParameters.put(<span class="string">"casServerLoginUrl"</span>, serverUrlPrefix);</span><br><span class="line">        initParameters.put(<span class="string">"serverName"</span>, clientHostUrl);</span><br><span class="line">        registration.setInitParameters(initParameters);</span><br><span class="line">        <span class="comment">// 设定加载的顺序</span></span><br><span class="line">        registration.setOrder(<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> registration;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * wraper过滤器:用户登录名过滤器(可选)，HttpServletRequest的包装类，附加了用户的Principal信息</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> FilterRegistrationBean <span class="title">filterWrapperRegistration</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        FilterRegistrationBean registration = <span class="keyword">new</span> FilterRegistrationBean();</span><br><span class="line">        registration.setFilter(<span class="keyword">new</span> HttpServletRequestWrapperFilter());</span><br><span class="line">        <span class="comment">// 设定匹配的路径</span></span><br><span class="line">        registration.addUrlPatterns(<span class="string">"/*"</span>);</span><br><span class="line">        <span class="comment">// 设定加载的顺序</span></span><br><span class="line">        registration.setOrder(<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> registration;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 添加监听器：用于监听用户的登出操作</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ServletListenerRegistrationBean&lt;EventListener&gt; <span class="title">singleSignOutListenerRegistration</span><span class="params">()</span></span>&#123;</span><br><span class="line">        ServletListenerRegistrationBean&lt;EventListener&gt; registrationBean = <span class="keyword">new</span> ServletListenerRegistrationBean&lt;EventListener&gt;();</span><br><span class="line">        registrationBean.setListener(<span class="keyword">new</span> SingleSignOutHttpSessionListener());</span><br><span class="line">        registrationBean.setOrder(<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> registrationBean;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>修改本地hosts，增加本地域名配置</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">127.0.0.1	picclient.com</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>CAS Server也需要配置，以便识别子系统</p>
+<ul>
+<li><p>由于子系统使用的是http，而非https。所以需要在application.properties中添加如下配置</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">cas.tgc.secure&#x3D;false</span><br><span class="line">cas.serviceRegistry.initFromJson&#x3D;true</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>结合上一篇文章，对CAS server的项目进行了拓展，在src\main\resources\servies\目录中，新建json文件，配置客户端的信息</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"@class"</span> : <span class="string">"org.apereo.cas.services.RegexRegisteredService"</span>,</span><br><span class="line">  <span class="attr">"serviceId"</span> : <span class="string">"^(http)://picclient.com.*"</span>,</span><br><span class="line">  <span class="attr">"name"</span> : <span class="string">"picclient"</span>,</span><br><span class="line">  <span class="attr">"id"</span> : <span class="number">10000001</span>,</span><br><span class="line">  <span class="attr">"description"</span> : <span class="string">"CAS Client pic"</span>,</span><br><span class="line">  <span class="attr">"evaluationOrder"</span> : <span class="number">10001</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>启动CAS server和CAS client之后，在访问client页面的时候，就会被重定向到CAS server进行认证，认证完成之后，再跳转回client页面</p>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="Spring-Security方式"><a href="#Spring-Security方式" class="headerlink" title="Spring Security方式"></a>Spring Security方式</h4><ul>
+<li><p>添加spring security以及spring security cas的依赖</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-security<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-cas --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.security<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-security-cas<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.3.2.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>yml文件添加如下配置，以便Filters初始化的时候进行使用</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">cas:</span><br><span class="line">  server-url-prefix: https:&#x2F;&#x2F;david4it.com:8443&#x2F;cas</span><br><span class="line">  server-login-url: https:&#x2F;&#x2F;david4it.com:8443&#x2F;cas&#x2F;login</span><br><span class="line">  server-logout-url: https:&#x2F;&#x2F;david4it.com:8443&#x2F;cas&#x2F;logout</span><br><span class="line">  client-host-url: http:&#x2F;&#x2F;message.client.com:9099&#x2F;login&#x2F;cas</span><br><span class="line">  client-logout-url: http:&#x2F;&#x2F;message.client.com:9099&#x2F;logout</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>添加CAS 所需的拦截器以及配置</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CASAutoConfig</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;cas.server-url-prefix&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> String serverUrlPrefix;</span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;cas.server-login-url&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> String serverLoginUrl;</span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;cas.server-logout-url&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> String serverLogoutUrl;</span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;cas.client-host-url&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> String clientHostUrl;</span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;cas.client-logout-url&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> String clientLogoutUrl;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ServiceProperties <span class="title">serviceProperties</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        ServiceProperties serviceProperties = <span class="keyword">new</span> ServiceProperties();</span><br><span class="line">        <span class="comment">//客户端的url地址，必须和服务器中的配置文件吻合，否则就是未认证授权的服务</span></span><br><span class="line">        serviceProperties.setService(clientHostUrl);</span><br><span class="line">        <span class="keyword">return</span> serviceProperties;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="meta">@Primary</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> AuthenticationEntryPoint <span class="title">authenticationEntryPoint</span><span class="params">(ServiceProperties sp)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//定义登陆页面为CAS服务器</span></span><br><span class="line">        CasAuthenticationEntryPoint entryPoint = <span class="keyword">new</span> CasAuthenticationEntryPoint();</span><br><span class="line">        entryPoint.setLoginUrl(serverLoginUrl);</span><br><span class="line">        entryPoint.setServiceProperties(sp);</span><br><span class="line">        <span class="keyword">return</span> entryPoint;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> TicketValidator <span class="title">ticketValidator</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//定义验证ticket的服务器地址</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Cas30ProxyTicketValidator(serverUrlPrefix);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> UserDetailsService <span class="title">userDetailsService</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//定义内存用户，用于验证用户信息的正确性</span></span><br><span class="line">        InMemoryUserDetailsManager manager = <span class="keyword">new</span> InMemoryUserDetailsManager();</span><br><span class="line">        manager.createUser(User.withUsername(<span class="string">"admin"</span>).password(<span class="string">"$2a$10$8GhWjgG4j2Ot15inivAAW.bmzAeu.If9J8HEV6j/jbI37.8GLwS2W"</span>).roles(<span class="string">"USER"</span>).build());</span><br><span class="line">        <span class="keyword">return</span> manager;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> CasAuthenticationProvider <span class="title">authenticationProvider</span><span class="params">(ServiceProperties sp, TicketValidator validator, UserDetailsService userDetailsService)</span> </span>&#123;</span><br><span class="line">        CasAuthenticationProvider provider = <span class="keyword">new</span> CasAuthenticationProvider();</span><br><span class="line">        provider.setTicketValidator(validator);</span><br><span class="line">        provider.setServiceProperties(sp);</span><br><span class="line">        provider.setKey(<span class="string">"david4it"</span>);</span><br><span class="line">        provider.setUserDetailsService(userDetailsService);</span><br><span class="line">        <span class="keyword">return</span> provider;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> CasAuthenticationFilter <span class="title">casAuthenticationFilter</span><span class="params">(ServiceProperties sp, AuthenticationProvider provider)</span> </span>&#123;</span><br><span class="line">        CasAuthenticationFilter filter = <span class="keyword">new</span> CasAuthenticationFilter();</span><br><span class="line">        filter.setServiceProperties(sp);</span><br><span class="line">        filter.setAuthenticationManager(<span class="keyword">new</span> ProviderManager(Arrays.asList(provider)));</span><br><span class="line">        <span class="keyword">return</span> filter;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> SingleSignOutFilter <span class="title">singleSignOutFilter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        SingleSignOutFilter singleSignOutFilter = <span class="keyword">new</span> SingleSignOutFilter();</span><br><span class="line">        singleSignOutFilter.setIgnoreInitConfiguration(<span class="keyword">true</span>);</span><br><span class="line">        <span class="keyword">return</span> singleSignOutFilter;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> LogoutFilter <span class="title">logoutFilter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        LogoutFilter logoutFilter = <span class="keyword">new</span> LogoutFilter(serverLogoutUrl, <span class="keyword">new</span> SecurityContextLogoutHandler());</span><br><span class="line">        logoutFilter.setFilterProcessesUrl(clientLogoutUrl);</span><br><span class="line">        <span class="keyword">return</span> logoutFilter;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>添加spring security相关配置</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@EnableWebSecurity</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CustomSecurityConfig</span> <span class="keyword">extends</span> <span class="title">WebSecurityConfigurerAdapter</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    AuthenticationEntryPoint entryPoint;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    AuthenticationProvider authenticationProvider;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    SingleSignOutFilter singleSignOutFilter;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    LogoutFilter logoutFilter;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    CasAuthenticationFilter authenticationFilter;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(AuthenticationManagerBuilder auth)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        auth.authenticationProvider(authenticationProvider);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(HttpSecurity http)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        http.csrf().disable()</span><br><span class="line">            .cors().disable()</span><br><span class="line">                .authorizeRequests().antMatchers(<span class="string">"/static/**"</span>, <span class="string">"/login/cas"</span>).permitAll()</span><br><span class="line">                .anyRequest().authenticated().and()</span><br><span class="line">                .exceptionHandling().authenticationEntryPoint(entryPoint).and()</span><br><span class="line">                .addFilter(authenticationFilter)</span><br><span class="line">                .addFilterBefore(singleSignOutFilter, CasAuthenticationFilter<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">                .<span class="title">addFilterBefore</span>(<span class="title">logoutFilter</span>, <span class="title">LogoutFilter</span>.<span class="title">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>修改本地hosts，增加本地域名配置</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">127.0.0.1	message.client.com</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>CAS Server也需要配置，以便识别子系统</p>
+<ul>
+<li><p>在src\main\resources\servies\目录中，新建json文件，配置客户端的信息</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"@class"</span> : <span class="string">"org.apereo.cas.services.RegexRegisteredService"</span>,</span><br><span class="line">  <span class="attr">"serviceId"</span> : <span class="string">"^(http)://message.client.com.*"</span>,</span><br><span class="line">  <span class="attr">"name"</span> : <span class="string">"messageclient"</span>,</span><br><span class="line">  <span class="attr">"id"</span> : <span class="number">10000002</span>,</span><br><span class="line">  <span class="attr">"description"</span> : <span class="string">"CAS Client message"</span>,</span><br><span class="line">  <span class="attr">"evaluationOrder"</span> : <span class="number">10002</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>启动CAS server和CAS client之后，在访问client页面的时候，就会被重定向到CAS server进行认证，认证完成之后，再跳转回client页面</p>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h4><ol>
+<li><p>在使用spring security + spring security cas的时候，遇到了重定向次数过多的问题</p>
+<p><img src="/images/sso/5.png" alt="avatar"></p>
+</li>
+</ol>
+<p>根据[官方问题指导]([<a href="https://apereo.github.io/cas/4.2.x/installation/Troubleshooting-Guide.html#:~:text=%E2%80%9CToo%20many%20redirect%E2%80%9D%20errors%20are,you%20will%20find%20the%20cause.]" target="_blank" rel="noopener">https://apereo.github.io/cas/4.2.x/installation/Troubleshooting-Guide.html#:~:text=%E2%80%9CToo%20many%20redirect%E2%80%9D%20errors%20are,you%20will%20find%20the%20cause.]</a>(<a href="https://apereo.github.io/cas/4.2.x/installation/Troubleshooting-Guide.html#:~:text=&quot;Too" target="_blank" rel="noopener">https://apereo.github.io/cas/4.2.x/installation/Troubleshooting-Guide.html#:~:text=&quot;Too</a> many redirect” errors are,you will find the cause.))可以了解到，这一定是配置上出现了问题。期初我的yml配置如下</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">cas:</span></span><br><span class="line">  <span class="attr">server-url-prefix:</span> <span class="string">https://david4it.com:8443/cas</span></span><br><span class="line">  <span class="attr">server-login-url:</span> <span class="string">https://david4it.com:8443/cas/login</span></span><br><span class="line">  <span class="attr">server-logout-url:</span> <span class="string">https://david4it.com:8443/cas/logout</span></span><br><span class="line">  <span class="comment">#client-host-url: http://message.client.com:9099/login/cas 正确配置</span></span><br><span class="line">  <span class="attr">client-host-url:</span> <span class="string">http://message.client.com:9099</span></span><br><span class="line">  <span class="attr">client-logout-url:</span> <span class="string">http://message.client.com:9099/logout</span></span><br></pre></td></tr></table></figure>
+
+<p>并且我的security配置也并没有放行<code>/login/cas</code>路径的校验。</p>
+<p>后来经过搜索，在<a href="https://stackoverflow.com/questions/32252695/getting-a-loop-redirect-with-spring-security-cas-but-should-be-working" target="_blank" rel="noopener">stackoverflow</a>上发现了和我一样问题的人，看了下解决方式，原来spring security 4.x以后的版本，CasAuthenticationFilter使用的默认路径为/login/cas。只需要添加上这个路径，就可以正常运行了。</p>
+<h4 id="源码以及注意事项"><a href="#源码以及注意事项" class="headerlink" title="源码以及注意事项"></a>源码以及注意事项</h4><p>CAS客户端Demo源码：<a href="https://github.com/david4It/cas_clients" target="_blank" rel="noopener">cas_client</a></p>
+<p>CAS服务端源码：<a href="https://github.com/david4It/cus_cas_server" target="_blank" rel="noopener">cus_cas_server</a></p>
+<p><strong>由于CAS服务端仅定制部分界面以及配置，cus_cas_server项目仅包含src的内容，确保项目结构如下图所示</strong></p>
+<p><img src="/images/sso/3.png" alt="avatar"></p>
+<p><strong>CAS服务端在打包的时候，在<code>WEB-INF/classes/services/</code>路径中会保留自带的客户端配置json文件，只保留自定义的客户端配置json文件即可</strong></p>
+<p><img src="/images/sso/6.png" alt="avatar"></p>
+]]></content>
+      <categories>
+        <category>CAS</category>
+      </categories>
+      <tags>
+        <tag>CAS</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>单点登录（二）</title>
+    <url>/2020/06/02/ckb0khpra0008twvjf1fl6bob/</url>
+    <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>已经对SSO以及CAS的基本概念和流程有了一定了解之后，就可以开始着手实现自己的CAS认证服务器了。本文主要讲解如何在本地使用HTTPS的方式启动CAS Server，以及定制CAS Server的部分页面。</p>
+<a id="more"></a>
+
+<h3 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h3><ol>
+<li>WIN10</li>
+<li>JDK1.8</li>
+<li>Intellij Idea</li>
+<li><a href="https://github.com/apereo/cas-overlay-template/tree/5.3" target="_blank" rel="noopener">cas-overlay-template 5.3</a> 这个版本也是支持1.8的最新版本了</li>
+<li>maven 3.6.1</li>
+<li>apache-tomcat-8.5.55</li>
+</ol>
+<h3 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h3><h4 id="CAS-Server的编译和启动"><a href="#CAS-Server的编译和启动" class="headerlink" title="CAS Server的编译和启动"></a>CAS Server的编译和启动</h4><ul>
+<li><p>cas-overlay-template编译</p>
+<p>将下载好的cas-overlay-template解压，然后进入到项目根目录，执行编译</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mvn clean install</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>启动cas服务</p>
+<p>将cas-overlay-template项目中编译好的war包放入到tomcat启动，启动完成之后，访问<a href="http://localhost:8080/cas/login，使用默认用户名和密码为casuser和Mellon进行登录" target="_blank" rel="noopener">http://localhost:8080/cas/login，使用默认用户名和密码为casuser和Mellon进行登录</a></p>
+</li>
+<li><p>为了模拟更加真实的环境，修改hosts，win10的hosts地址为</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">C:\WINDOWS\system32\drivers\etc</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在hosts中增加如下记录，在win10中推荐使用<a href="https://github.com/scottlerch/HostsFileEditor/releases" target="_blank" rel="noopener">Hosts File Editor</a></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">127.0.0.1 david4it.com</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="开启HTTPS服务"><a href="#开启HTTPS服务" class="headerlink" title="开启HTTPS服务"></a>开启HTTPS服务</h4><ul>
+<li><p>进入tomcat的根目录中，执行命令生成https证书</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">keytool -genkey -alias tomcat -keyalg RSA -keypass tomcat -storepass tomcat -keystore server.keystore -validity 3600</span><br><span class="line"></span><br><span class="line">C:\Users\SMESC\Desktop\cas-overlay-template-5.3&gt;keytool -genkey -alias tomcat -keyalg RSA -keypass tomcat -storepass tomcat -keystore server.keystore -validity 3600</span><br><span class="line">您的名字与姓氏是什么?</span><br><span class="line">  [Unknown]:  david4it.com</span><br><span class="line">您的组织单位名称是什么?</span><br><span class="line">  [Unknown]:  org</span><br><span class="line">您的组织名称是什么?</span><br><span class="line">  [Unknown]:  org</span><br><span class="line">您所在的城市或区域名称是什么?</span><br><span class="line">  [Unknown]:  cd</span><br><span class="line">您所在的省/市/自治区名称是什么?</span><br><span class="line">  [Unknown]:  sc</span><br><span class="line">该单位的双字母国家/地区代码是什么?</span><br><span class="line">  [Unknown]:  cn</span><br><span class="line">CN=david4it.com, OU=org, O=org, L=cd, ST=sc, C=cn是否正确?</span><br><span class="line">  [否]:  是</span><br><span class="line"></span><br><span class="line">Warning:</span><br><span class="line">JKS 密钥库使用专用格式。建议使用 "keytool -importkeystore -srckeystore server.keystore -destkeystore server.keystore -deststoretype pkcs12" 迁移到行业标准格式 PKCS12。</span><br></pre></td></tr></table></figure>
+
+<p><strong>填写信息的时候要注意，名字与姓氏这一项，一定要和hosts中你自定义的域名相匹配！</strong></p>
+<p>keytool  -genkey 参数含义</p>
+<ul>
+<li>alias: 别名 这里起名tomcat</li>
+<li>keyalg: 证书算法，RSA</li>
+<li>keystore：证书生成的目标路径和文件名</li>
+<li>keypass：密钥保护密码</li>
+<li>storepass：存储密码</li>
+<li>validity：证书有效天数</li>
+</ul>
+<p>更多关于证书生成参数，请参看<a href="http://blog.chinaunix.net/uid-17102734-id-2830223.html" target="_blank" rel="noopener">http://blog.chinaunix.net/uid-17102734-id-2830223.html</a></p>
+</li>
+<li><p>生成server.cer文件</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">keytool -export -trustcacerts -alias tomcat -file server.cer -keystore server.keystore -storepass tomcat</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>导入证书</p>
+<ul>
+<li><p>找到jdk1.8的安装路径，win10可以在环境变量中进行查看。找到文件cacerts</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">D:\Program Files\Java\jdk1.8.0_201\jre\lib\security\cacerts</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用命令将证书导入到jdk中</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"> keytool -import -trustcacerts -alias tomcat -keystore "D:\Program Files\Java\jdk1.8.0_201\jre\lib\security\cacerts" -file "C:\Users\SMESC\Desktop\apache-tomcat-8.5.55\server.cer" -storepass changeit</span><br><span class="line"> </span><br><span class="line">所有者: CN=david4it.com, OU=cas, O=cas, L=cd, ST=sc, C=cn</span><br><span class="line">发布者: CN=david4it.com, OU=cas, O=cas, L=cd, ST=sc, C=cn</span><br><span class="line">序列号: 3e3f3a5d</span><br><span class="line">有效期为 Tue Jun 02 14:09:47 CST 2020 至 Thu Apr 11 14:09:47 CST 2030</span><br><span class="line">证书指纹:</span><br><span class="line">         MD5:  7E:D7:48:6C:A7:BB:CA:7E:6F:D3:93:80:5B:B1:F7:1A</span><br><span class="line">         SHA1: 86:62:89:8F:08:D9:84:32:6C:3C:90:9B:71:94:7F:27:B6:5C:AF:AD</span><br><span class="line">         SHA256: 3A:47:0B:EF:B3:CD:68:02:76:46:C2:6E:3A:6F:63:1F:84:30:2F:3B:1C:85:D2:46:9A:7A:E7:5F:CE:E1:14:F4</span><br><span class="line">签名算法名称: SHA256withRSA</span><br><span class="line">主体公共密钥算法: 2048 位 RSA 密钥</span><br><span class="line">版本: 3</span><br><span class="line"></span><br><span class="line">扩展:</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">1: ObjectId: 2.5.29.14 Criticality=<span class="literal">false</span></span></span><br><span class="line">SubjectKeyIdentifier [</span><br><span class="line">KeyIdentifier [</span><br><span class="line">0000: 6E 3B 19 D8 B6 85 DA A2   BC 71 3E 96 80 8C 71 CB  n;.......q&gt;...q.</span><br><span class="line">0010: 38 86 04 F9                                        8...</span><br><span class="line">]</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">是否信任此证书? [否]:  是</span><br><span class="line">证书已添加到密钥库中</span><br></pre></td></tr></table></figure>
+
+<p><strong>证书库默认密码为changeit，不能填前面自定义的密码</strong></p>
+</li>
+<li><p>若想删除证书，则执行如下命令</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">keytool -delete -alias tomcat -keystore "D:\Program Files\Java\jdk1.8.0_201\jre\lib\security\cacerts" -storepass changeit</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+</li>
+</ul>
+<pre><code>**JDK的cacerts文件路径以及tomcat的路径要根据实际目录进行调整**</code></pre><ul>
+<li><p>tomcat开启https服务</p>
+<ul>
+<li><p>编辑\conf\server.xml文件，添加如下内容</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Connector</span> <span class="attr">port</span>=<span class="string">"8443"</span> <span class="attr">protocol</span>=<span class="string">"org.apache.coyote.http11.Http11NioProtocol"</span></span></span><br><span class="line"><span class="tag">           <span class="attr">maxThreads</span>=<span class="string">"150"</span> <span class="attr">SSLEnabled</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">SSLHostConfig</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Certificate</span> <span class="attr">certificateKeystoreFile</span>=<span class="string">"server.keystore"</span> <span class="attr">certificateKeystorePassword</span>=<span class="string">"tomcat"</span></span></span><br><span class="line"><span class="tag">                     <span class="attr">type</span>=<span class="string">"RSA"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">SSLHostConfig</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Connector</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>port: https的端口,默认8443</li>
+<li>clientAuth:设置是否双向验证，默认为false，设置为true代表双向验证keystoreFile</li>
+<li>keystoreFile: keystore证书的路径</li>
+<li>keystorePass: 生成keystore时的口令</li>
+</ul>
+</li>
+<li><p>测试https开启成功</p>
+<p>启动tomcat，访问<a href="https://david4it.com:8443" target="_blank" rel="noopener">https://david4it.com:8443</a></p>
+<p>一般浏览器会显示该连接不安全，你在浏览器手动将此连接设置为可信任的，然后出现tomcat页面即说明https配置成功</p>
+</li>
+<li><p>CAS server还需要配置好证书的相关信息，在application.properties对原有默认的配置进行修改</p>
+<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="meta">server.ssl.key-store</span>=<span class="string">file:C:/Users/SMESC/Desktop/apache-tomcat-8.5.55/server.keystore</span></span><br><span class="line"><span class="meta">server.ssl.key-store-password</span>=<span class="string">tomcat</span></span><br><span class="line"><span class="meta">server.ssl.key-password</span>=<span class="string">changeit</span></span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="CAS-Server数据库配置"><a href="#CAS-Server数据库配置" class="headerlink" title="CAS Server数据库配置"></a>CAS Server数据库配置</h4><p>用户名和密码是使用默认的，而实际开发中往往是需要连接数据库进行数据库查询，现在就需要添加上数据库的连接信息，确保用户信息是从数据库读取到的。</p>
+<ul>
+<li><p>在cas-overlay-template项目的pom.xml文件中添加jdbc数据库连接相关依赖</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;dependencies&gt;</span><br><span class="line">  &lt;dependency&gt;</span><br><span class="line">      &lt;groupId&gt;org.apereo.cas&lt;&#x2F;groupId&gt;</span><br><span class="line">      &lt;artifactId&gt;cas-server-support-jdbc&lt;&#x2F;artifactId&gt;</span><br><span class="line">      &lt;version&gt;$&#123;cas.version&#125;&lt;&#x2F;version&gt;</span><br><span class="line">  &lt;&#x2F;dependency&gt;</span><br><span class="line">  &lt;dependency&gt;</span><br><span class="line">      &lt;groupId&gt;org.apereo.cas&lt;&#x2F;groupId&gt;</span><br><span class="line">      &lt;artifactId&gt;cas-server-support-jdbc-drivers&lt;&#x2F;artifactId&gt;</span><br><span class="line">      &lt;version&gt;$&#123;cas.version&#125;&lt;&#x2F;version&gt;</span><br><span class="line">  &lt;&#x2F;dependency&gt;</span><br><span class="line"> &lt;&#x2F;dependencies&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>准备好数据结构的sql</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-- 创建数据库表空间</span><br><span class="line">CREATE DATABASE test_cas DEFAULT CHARSET utf8 COLLATE utf8_general_ci;  </span><br><span class="line">USE test_cas;  </span><br><span class="line">-- 创建帐号信息表</span><br><span class="line">DROP TABLE IF EXISTS &#96;cas_user_base&#96;;  </span><br><span class="line">CREATE TABLE &#96;cas_user_base&#96; (  </span><br><span class="line">  &#96;id&#96; INT(11) NOT NULL AUTO_INCREMENT,  </span><br><span class="line">  &#96;user_name&#96; VARCHAR(45) DEFAULT NULL,  </span><br><span class="line">  &#96;user_psd&#96; VARCHAR(100) DEFAULT NULL, </span><br><span class="line">   &#96;expired&#96; INT(1) DEFAULT 0,</span><br><span class="line">  &#96;disabled&#96; INT(1) DEFAULT 0,</span><br><span class="line">  PRIMARY KEY (&#96;id&#96;)  </span><br><span class="line">);  </span><br><span class="line">-- 插入登录帐号数据 密码是123456</span><br><span class="line">INSERT INTO &#96;cas_user_base&#96; VALUES (1,&#39;admin&#39;,&#39;e10adc3949ba59abbe56e057f20f883e&#39;, 0, 0),(2,&#39;guest&#39;,&#39;e10adc3949ba59abbe56e057f20f883e&#39;, 0, 0);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>为了对项目中的配置进行覆盖，新建如下图所示的结构，把cas-overlay-template-5.3\overlays\org.apereo.cas.cas-server-webapp-tomcat-5.3.14\WEB-INF\classes\application.properties配置文件复制一份出来，放到cas-overlay-template-5.3\src\main\resources\目录下，加入jdbc相关的配置，并注释掉原有的认证配置</p>
+<p><img src="/images/sso/3.png" alt="avatar"></p>
+<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="comment">##</span></span><br><span class="line"><span class="comment"># CAS Authentication Credentials</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># cas.authn.accept.users=casuser::Mellon</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#数据库查询sql</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].sql</span>=<span class="string">SELECT * FROM cas_user_base WHERE user_name=?</span></span><br><span class="line"><span class="comment">#数据库连接信息</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].url</span>=<span class="string">jdbc:mysql://localhost:3306/test_cas?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;useSSL=false&amp;serverTimezone=UTC</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].dialect</span>=<span class="string">org.hibernate.dialect.MySQLDialect</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].user</span>=<span class="string">root</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].password</span>=<span class="string">Passw0rd</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].driverClass</span>=<span class="string">com.mysql.jdbc.Driver</span></span><br><span class="line"><span class="comment">#以user_psd作为密码字段</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].fieldPassword</span>=<span class="string">user_psd</span></span><br><span class="line"><span class="comment">#指定过期字段 int 类型 1为过期 0 为不过期</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].fieldExpired</span>=<span class="string">expired</span></span><br><span class="line"><span class="comment">#指定过期字段 int 类型 1为不可用 0为可用</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].fieldDisabled</span>=<span class="string">disabled</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#配置加密策略</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].passwordEncoder.type</span>=<span class="string">DEFAULT</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].passwordEncoder.characterEncoding</span>=<span class="string">UTF-8</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].passwordEncoder.encodingAlgorithm</span>=<span class="string">MD5</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>启动项目进行测试，发现输入admin/123456后可以直接登录，证明我们的配置已经生效了。</p>
+</li>
+</ul>
+<h4 id="CAS登录页面自定义"><a href="#CAS登录页面自定义" class="headerlink" title="CAS登录页面自定义"></a>CAS登录页面自定义</h4><p>经过上述的改动之后，一个基本的CAS server就已经实现了，现在需要对界面做一些定制化的修改，以达到我们想要的展示效果。</p>
+<p><img src="/images/sso/4.png" alt="avatar"></p>
+<p>页面的修改是完全基于现有页面基础上进行的，需要修改的页面按照原项目的路径复制一份出来进行修改，从而达到覆盖的目的，当然也可以完全自定义页面。</p>
+<h4 id="密码安全性提升"><a href="#密码安全性提升" class="headerlink" title="密码安全性提升"></a>密码安全性提升</h4><figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="comment">#配置加密策略</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].passwordEncoder.type</span>=<span class="string">DEFAULT</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].passwordEncoder.characterEncoding</span>=<span class="string">UTF-8</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].passwordEncoder.encodingAlgorithm</span>=<span class="string">MD5</span></span><br></pre></td></tr></table></figure>
+
+<p>QueryJdbcAuthenticationProperties中有一个加密的对象PasswordEncoderProperties，主要支持如下几种加密方式：</p>
+<ul>
+<li><strong>NONE</strong> 不加密(默认的)</li>
+<li><strong>DEFAULT</strong> 使用encodingAlgorithm来定义加密方式（MD5,SHA）</li>
+<li><strong>STANDARD</strong> 标准加密，使用1024的SHA-256散列迭代和随机8字节随机盐值进行加密。</li>
+<li><strong>BCRYPT</strong> 使用BCryptPasswordEncoder方法加密</li>
+<li><strong>SCRYPT</strong> 使用SCryptPasswordEncoder方法加密</li>
+<li><strong>PBKDF2</strong> 使用Pbkdf2PasswordEncoder方法加密</li>
+</ul>
+<p>最开始使用的<strong>DEFAULT</strong>，使用的是MD5，而且并未做加盐的处理，是可以进行破解的，感兴趣的话，可以在<a href="https://www.somd5.com/" target="_blank" rel="noopener">这里</a>进行尝试，将e10adc3949ba59abbe56e057f20f883e输入进行解密，可以看到返回的结果是123456</p>
+<p>现在将加密现在更新为<strong>BCRYPT</strong></p>
+<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="comment">#更新加密策略，使用BCRYPT，增强安全性</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].passwordEncoder.type</span>=<span class="string">BCRYPT</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].passwordEncoder.characterEncoding</span>=<span class="string">UTF-8</span></span><br></pre></td></tr></table></figure>
+
+<p>变更加密策略之后还需要更新数据中的密码的字符串，可以通过new BCryptPasswordEncoder().encode(“123456”)得到对应的加密结果</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> cas_user_base <span class="keyword">SET</span> user_psd = <span class="string">'$2a$10$8GhWjgG4j2Ot15inivAAW.bmzAeu.If9J8HEV6j/jbI37.8GLwS2W'</span></span><br></pre></td></tr></table></figure>
+
+<p>通过实现org.springframework.security.crypto.password.PasswordEncoder扩展加密算法，此时需要配置cas.authn.jdbc.query[0].passwordEncoder.type=你实现类的全限定名。</p>
+<p>本文涉及的src以及pom.xml文件已经放到<a href="https://github.com/david4It/cus_cas_server" target="_blank" rel="noopener">github</a></p>
+]]></content>
+      <categories>
+        <category>CAS</category>
+      </categories>
+      <tags>
+        <tag>CAS</tag>
+      </tags>
   </entry>
 </search>

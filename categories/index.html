@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 
 
-<html lang="zh-CN">
+<html lang="zh-Hans">
 
 
 <head>
   <meta charset="utf-8" />
    
-  <meta name="keywords" content="代码,博客" />
+  <meta name="keywords" content="生活，思考，代码，博客" />
    
-  <meta name="description" content="个人技术博客" />
+  <meta name="description" content="记录生活" />
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
@@ -43,10 +43,14 @@
 </html>
 
 <body>
-  
   <div id="app">
     <main class="content on">
       <section class="outer">
+  
+    <h1 class="page-type-title">Categories</h1>
+    <div class="categories-box">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/CAS/">CAS</a><span class="category-list-count">3</span></li></ul>
+    </div>
   
 </section>
       <footer class="footer">
@@ -63,14 +67,21 @@
         
         
         
-        由 <a href="https://hexo.io" target="_blank">Hexo</a> 强力驱动
+        Powered by <a href="https://hexo.io" target="_blank">Hexo</a>
         <span class="division">|</span>
-        主题 - <a href="https://github.com/Shen-Yu/hexo-theme-ayer" target="_blank">Ayer</a>
+        Theme - <a href="https://github.com/Shen-Yu/hexo-theme-ayer" target="_blank">Ayer</a>
         
       </li>
     </ul>
     <ul>
       <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>Visitors:<span id="busuanzi_value_site_uv"></span></s>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>Views:<span id="busuanzi_value_page_pv"></span></span>
+</span>
         
       </li>
     </ul>
@@ -80,6 +91,8 @@
     <ul>
       <li>
         <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
         
       </li>
     </ul>
@@ -128,7 +141,7 @@
   <ul class="nav">
     <li class="nav-item">
       
-      <a class="nav-item-link nav-item-search"  title="搜索">
+      <a class="nav-item-link nav-item-search"  title="Search">
         <i class="ri-search-line"></i>
       </a>
       
@@ -162,13 +175,13 @@
   <div class="reward-box">
     
     <div class="reward-item">
-      <img class="reward-img" src="/images/alipay.jpg">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/alipay.jpg">
       <span class="reward-type">支付宝</span>
     </div>
     
     
     <div class="reward-item">
-      <img class="reward-img" src="/images/wechat.jpg">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/wechat.jpg">
       <span class="reward-type">微信</span>
     </div>
     
@@ -316,37 +329,19 @@
 
 <!-- MathJax -->
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-      tex2jax: {
-          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
-          processEscapes: true,
-          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-      }
-  });
-
-  MathJax.Hub.Queue(function() {
-      var all = MathJax.Hub.getAllJax(), i;
-      for(i=0; i < all.length; i += 1) {
-          all[i].SourceElement().parentNode.className += ' has-jax';
-      }
-  });
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.6/unpacked/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-<script>
-  var ayerConfig = {
-    mathjax: true
-  }
-</script>
-
 <!-- Katex -->
 
 <!-- busuanzi  -->
 
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
 <!-- ClickLove -->
 
-<!-- ClickBoom -->
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
 
 <!-- CodeCopy -->
 
@@ -409,8 +404,13 @@
 </script>
 
 
+<!-- CanvasBackground -->
+
 
     
+    
+    
+      
   </div>
 </body>
 

@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-Hans">
+
+
+<head>
+  <meta charset="utf-8" />
+   
+  <meta name="keywords" content="生活，思考，代码，博客" />
+   
+  <meta name="description" content="记录生活" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>
+    单点登录（二） |  唯
+  </title>
+  <meta name="generator" content="hexo-theme-ayer">
+  
+  <link rel="shortcut icon" href="/favicon.ico" />
+  
+  
+<link rel="stylesheet" href="/dist/main.css">
+
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/css/remixicon.min.css">
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+  
+  
+<script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+
+  
+  
+
+  
+
+<link rel="alternate" href="/atom.xml" title="唯" type="application/atom+xml">
+</head>
+
+</html>
+
+<body>
+  <div id="app">
+    <main class="content on">
+      <section class="outer">
+  <article id="post-单点登录（二）" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  单点登录（二）
+</h1>
+ 
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2020/06/02/ckb0khpra0008twvjf1fl6bob/" class="article-date">
+  <time datetime="2020-06-02T08:28:46.000Z" itemprop="datePublished">2020-06-02</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/CAS/">CAS</a>
+  </div>
+
+      
+      
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> Word count:</span>
+            <span class="post-count">2.2k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> Reading time≈</span>
+            <span class="post-count">10 min</span>
+        </span>
+    </span>
+</div>
+
+      
+    </div>
+    
+
+    
+    
+    <div class="tocbot"></div>
+
+
+
+
+
+    
+
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+
+      
+      <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>已经对SSO以及CAS的基本概念和流程有了一定了解之后，就可以开始着手实现自己的CAS认证服务器了。本文主要讲解如何在本地使用HTTPS的方式启动CAS Server，以及定制CAS Server的部分页面。</p>
+<a id="more"></a>
+
+<h3 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h3><ol>
+<li>WIN10</li>
+<li>JDK1.8</li>
+<li>Intellij Idea</li>
+<li><a href="https://github.com/apereo/cas-overlay-template/tree/5.3" target="_blank" rel="noopener">cas-overlay-template 5.3</a> 这个版本也是支持1.8的最新版本了</li>
+<li>maven 3.6.1</li>
+<li>apache-tomcat-8.5.55</li>
+</ol>
+<h3 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h3><h4 id="CAS-Server的编译和启动"><a href="#CAS-Server的编译和启动" class="headerlink" title="CAS Server的编译和启动"></a>CAS Server的编译和启动</h4><ul>
+<li><p>cas-overlay-template编译</p>
+<p>将下载好的cas-overlay-template解压，然后进入到项目根目录，执行编译</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn clean install</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>启动cas服务</p>
+<p>将cas-overlay-template项目中编译好的war包放入到tomcat启动，启动完成之后，访问<a href="http://localhost:8080/cas/login，使用默认用户名和密码为casuser和Mellon进行登录" target="_blank" rel="noopener">http://localhost:8080/cas/login，使用默认用户名和密码为casuser和Mellon进行登录</a></p>
+</li>
+<li><p>为了模拟更加真实的环境，修改hosts，win10的hosts地址为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\WINDOWS\system32\drivers\etc</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在hosts中增加如下记录，在win10中推荐使用<a href="https://github.com/scottlerch/HostsFileEditor/releases" target="_blank" rel="noopener">Hosts File Editor</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1 david4it.com</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="开启HTTPS服务"><a href="#开启HTTPS服务" class="headerlink" title="开启HTTPS服务"></a>开启HTTPS服务</h4><ul>
+<li><p>进入tomcat的根目录中，执行命令生成https证书</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">keytool -genkey -alias tomcat -keyalg RSA -keypass tomcat -storepass tomcat -keystore server.keystore -validity 3600</span><br><span class="line"></span><br><span class="line">C:\Users\SMESC\Desktop\cas-overlay-template-5.3&gt;keytool -genkey -alias tomcat -keyalg RSA -keypass tomcat -storepass tomcat -keystore server.keystore -validity 3600</span><br><span class="line">您的名字与姓氏是什么?</span><br><span class="line">  [Unknown]:  david4it.com</span><br><span class="line">您的组织单位名称是什么?</span><br><span class="line">  [Unknown]:  org</span><br><span class="line">您的组织名称是什么?</span><br><span class="line">  [Unknown]:  org</span><br><span class="line">您所在的城市或区域名称是什么?</span><br><span class="line">  [Unknown]:  cd</span><br><span class="line">您所在的省/市/自治区名称是什么?</span><br><span class="line">  [Unknown]:  sc</span><br><span class="line">该单位的双字母国家/地区代码是什么?</span><br><span class="line">  [Unknown]:  cn</span><br><span class="line">CN=david4it.com, OU=org, O=org, L=cd, ST=sc, C=cn是否正确?</span><br><span class="line">  [否]:  是</span><br><span class="line"></span><br><span class="line">Warning:</span><br><span class="line">JKS 密钥库使用专用格式。建议使用 "keytool -importkeystore -srckeystore server.keystore -destkeystore server.keystore -deststoretype pkcs12" 迁移到行业标准格式 PKCS12。</span><br></pre></td></tr></table></figure>
+
+<p><strong>填写信息的时候要注意，名字与姓氏这一项，一定要和hosts中你自定义的域名相匹配！</strong></p>
+<p>keytool  -genkey 参数含义</p>
+<ul>
+<li>alias: 别名 这里起名tomcat</li>
+<li>keyalg: 证书算法，RSA</li>
+<li>keystore：证书生成的目标路径和文件名</li>
+<li>keypass：密钥保护密码</li>
+<li>storepass：存储密码</li>
+<li>validity：证书有效天数</li>
+</ul>
+<p>更多关于证书生成参数，请参看<a href="http://blog.chinaunix.net/uid-17102734-id-2830223.html" target="_blank" rel="noopener">http://blog.chinaunix.net/uid-17102734-id-2830223.html</a></p>
+</li>
+<li><p>生成server.cer文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">keytool -export -trustcacerts -alias tomcat -file server.cer -keystore server.keystore -storepass tomcat</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>导入证书</p>
+<ul>
+<li><p>找到jdk1.8的安装路径，win10可以在环境变量中进行查看。找到文件cacerts</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">D:\Program Files\Java\jdk1.8.0_201\jre\lib\security\cacerts</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用命令将证书导入到jdk中</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"> keytool -import -trustcacerts -alias tomcat -keystore "D:\Program Files\Java\jdk1.8.0_201\jre\lib\security\cacerts" -file "C:\Users\SMESC\Desktop\apache-tomcat-8.5.55\server.cer" -storepass changeit</span><br><span class="line"> </span><br><span class="line">所有者: CN=david4it.com, OU=cas, O=cas, L=cd, ST=sc, C=cn</span><br><span class="line">发布者: CN=david4it.com, OU=cas, O=cas, L=cd, ST=sc, C=cn</span><br><span class="line">序列号: 3e3f3a5d</span><br><span class="line">有效期为 Tue Jun 02 14:09:47 CST 2020 至 Thu Apr 11 14:09:47 CST 2030</span><br><span class="line">证书指纹:</span><br><span class="line">         MD5:  7E:D7:48:6C:A7:BB:CA:7E:6F:D3:93:80:5B:B1:F7:1A</span><br><span class="line">         SHA1: 86:62:89:8F:08:D9:84:32:6C:3C:90:9B:71:94:7F:27:B6:5C:AF:AD</span><br><span class="line">         SHA256: 3A:47:0B:EF:B3:CD:68:02:76:46:C2:6E:3A:6F:63:1F:84:30:2F:3B:1C:85:D2:46:9A:7A:E7:5F:CE:E1:14:F4</span><br><span class="line">签名算法名称: SHA256withRSA</span><br><span class="line">主体公共密钥算法: 2048 位 RSA 密钥</span><br><span class="line">版本: 3</span><br><span class="line"></span><br><span class="line">扩展:</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">1: ObjectId: 2.5.29.14 Criticality=<span class="literal">false</span></span></span><br><span class="line">SubjectKeyIdentifier [</span><br><span class="line">KeyIdentifier [</span><br><span class="line">0000: 6E 3B 19 D8 B6 85 DA A2   BC 71 3E 96 80 8C 71 CB  n;.......q&gt;...q.</span><br><span class="line">0010: 38 86 04 F9                                        8...</span><br><span class="line">]</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">是否信任此证书? [否]:  是</span><br><span class="line">证书已添加到密钥库中</span><br></pre></td></tr></table></figure>
+
+<p><strong>证书库默认密码为changeit，不能填前面自定义的密码</strong></p>
+</li>
+<li><p>若想删除证书，则执行如下命令</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">keytool -delete -alias tomcat -keystore "D:\Program Files\Java\jdk1.8.0_201\jre\lib\security\cacerts" -storepass changeit</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+</li>
+</ul>
+<pre><code>**JDK的cacerts文件路径以及tomcat的路径要根据实际目录进行调整**</code></pre><ul>
+<li><p>tomcat开启https服务</p>
+<ul>
+<li><p>编辑\conf\server.xml文件，添加如下内容</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Connector</span> <span class="attr">port</span>=<span class="string">"8443"</span> <span class="attr">protocol</span>=<span class="string">"org.apache.coyote.http11.Http11NioProtocol"</span></span></span><br><span class="line"><span class="tag">           <span class="attr">maxThreads</span>=<span class="string">"150"</span> <span class="attr">SSLEnabled</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">SSLHostConfig</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Certificate</span> <span class="attr">certificateKeystoreFile</span>=<span class="string">"server.keystore"</span> <span class="attr">certificateKeystorePassword</span>=<span class="string">"tomcat"</span></span></span><br><span class="line"><span class="tag">                     <span class="attr">type</span>=<span class="string">"RSA"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">SSLHostConfig</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Connector</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>port: https的端口,默认8443</li>
+<li>clientAuth:设置是否双向验证，默认为false，设置为true代表双向验证keystoreFile</li>
+<li>keystoreFile: keystore证书的路径</li>
+<li>keystorePass: 生成keystore时的口令</li>
+</ul>
+</li>
+<li><p>测试https开启成功</p>
+<p>启动tomcat，访问<a href="https://david4it.com:8443" target="_blank" rel="noopener">https://david4it.com:8443</a></p>
+<p>一般浏览器会显示该连接不安全，你在浏览器手动将此连接设置为可信任的，然后出现tomcat页面即说明https配置成功</p>
+</li>
+<li><p>CAS server还需要配置好证书的相关信息，在application.properties对原有默认的配置进行修改</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">server.ssl.key-store</span>=<span class="string">file:C:/Users/SMESC/Desktop/apache-tomcat-8.5.55/server.keystore</span></span><br><span class="line"><span class="meta">server.ssl.key-store-password</span>=<span class="string">tomcat</span></span><br><span class="line"><span class="meta">server.ssl.key-password</span>=<span class="string">changeit</span></span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="CAS-Server数据库配置"><a href="#CAS-Server数据库配置" class="headerlink" title="CAS Server数据库配置"></a>CAS Server数据库配置</h4><p>用户名和密码是使用默认的，而实际开发中往往是需要连接数据库进行数据库查询，现在就需要添加上数据库的连接信息，确保用户信息是从数据库读取到的。</p>
+<ul>
+<li><p>在cas-overlay-template项目的pom.xml文件中添加jdbc数据库连接相关依赖</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependencies&gt;</span><br><span class="line">  &lt;dependency&gt;</span><br><span class="line">      &lt;groupId&gt;org.apereo.cas&lt;&#x2F;groupId&gt;</span><br><span class="line">      &lt;artifactId&gt;cas-server-support-jdbc&lt;&#x2F;artifactId&gt;</span><br><span class="line">      &lt;version&gt;$&#123;cas.version&#125;&lt;&#x2F;version&gt;</span><br><span class="line">  &lt;&#x2F;dependency&gt;</span><br><span class="line">  &lt;dependency&gt;</span><br><span class="line">      &lt;groupId&gt;org.apereo.cas&lt;&#x2F;groupId&gt;</span><br><span class="line">      &lt;artifactId&gt;cas-server-support-jdbc-drivers&lt;&#x2F;artifactId&gt;</span><br><span class="line">      &lt;version&gt;$&#123;cas.version&#125;&lt;&#x2F;version&gt;</span><br><span class="line">  &lt;&#x2F;dependency&gt;</span><br><span class="line"> &lt;&#x2F;dependencies&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>准备好数据结构的sql</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">-- 创建数据库表空间</span><br><span class="line">CREATE DATABASE test_cas DEFAULT CHARSET utf8 COLLATE utf8_general_ci;  </span><br><span class="line">USE test_cas;  </span><br><span class="line">-- 创建帐号信息表</span><br><span class="line">DROP TABLE IF EXISTS &#96;cas_user_base&#96;;  </span><br><span class="line">CREATE TABLE &#96;cas_user_base&#96; (  </span><br><span class="line">  &#96;id&#96; INT(11) NOT NULL AUTO_INCREMENT,  </span><br><span class="line">  &#96;user_name&#96; VARCHAR(45) DEFAULT NULL,  </span><br><span class="line">  &#96;user_psd&#96; VARCHAR(100) DEFAULT NULL, </span><br><span class="line">   &#96;expired&#96; INT(1) DEFAULT 0,</span><br><span class="line">  &#96;disabled&#96; INT(1) DEFAULT 0,</span><br><span class="line">  PRIMARY KEY (&#96;id&#96;)  </span><br><span class="line">);  </span><br><span class="line">-- 插入登录帐号数据 密码是123456</span><br><span class="line">INSERT INTO &#96;cas_user_base&#96; VALUES (1,&#39;admin&#39;,&#39;e10adc3949ba59abbe56e057f20f883e&#39;, 0, 0),(2,&#39;guest&#39;,&#39;e10adc3949ba59abbe56e057f20f883e&#39;, 0, 0);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>为了对项目中的配置进行覆盖，新建如下图所示的结构，把cas-overlay-template-5.3\overlays\org.apereo.cas.cas-server-webapp-tomcat-5.3.14\WEB-INF\classes\application.properties配置文件复制一份出来，放到cas-overlay-template-5.3\src\main\resources\目录下，加入jdbc相关的配置，并注释掉原有的认证配置</p>
+<p><img src="/images/sso/3.png" alt="avatar"></p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">##</span></span><br><span class="line"><span class="comment"># CAS Authentication Credentials</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># cas.authn.accept.users=casuser::Mellon</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#数据库查询sql</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].sql</span>=<span class="string">SELECT * FROM cas_user_base WHERE user_name=?</span></span><br><span class="line"><span class="comment">#数据库连接信息</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].url</span>=<span class="string">jdbc:mysql://localhost:3306/test_cas?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;useSSL=false&amp;serverTimezone=UTC</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].dialect</span>=<span class="string">org.hibernate.dialect.MySQLDialect</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].user</span>=<span class="string">root</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].password</span>=<span class="string">Passw0rd</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].driverClass</span>=<span class="string">com.mysql.jdbc.Driver</span></span><br><span class="line"><span class="comment">#以user_psd作为密码字段</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].fieldPassword</span>=<span class="string">user_psd</span></span><br><span class="line"><span class="comment">#指定过期字段 int 类型 1为过期 0 为不过期</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].fieldExpired</span>=<span class="string">expired</span></span><br><span class="line"><span class="comment">#指定过期字段 int 类型 1为不可用 0为可用</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].fieldDisabled</span>=<span class="string">disabled</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#配置加密策略</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].passwordEncoder.type</span>=<span class="string">DEFAULT</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].passwordEncoder.characterEncoding</span>=<span class="string">UTF-8</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].passwordEncoder.encodingAlgorithm</span>=<span class="string">MD5</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>启动项目进行测试，发现输入admin/123456后可以直接登录，证明我们的配置已经生效了。</p>
+</li>
+</ul>
+<h4 id="CAS登录页面自定义"><a href="#CAS登录页面自定义" class="headerlink" title="CAS登录页面自定义"></a>CAS登录页面自定义</h4><p>经过上述的改动之后，一个基本的CAS server就已经实现了，现在需要对界面做一些定制化的修改，以达到我们想要的展示效果。</p>
+<p><img src="/images/sso/4.png" alt="avatar"></p>
+<p>页面的修改是完全基于现有页面基础上进行的，需要修改的页面按照原项目的路径复制一份出来进行修改，从而达到覆盖的目的，当然也可以完全自定义页面。</p>
+<h4 id="密码安全性提升"><a href="#密码安全性提升" class="headerlink" title="密码安全性提升"></a>密码安全性提升</h4><figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#配置加密策略</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].passwordEncoder.type</span>=<span class="string">DEFAULT</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].passwordEncoder.characterEncoding</span>=<span class="string">UTF-8</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].passwordEncoder.encodingAlgorithm</span>=<span class="string">MD5</span></span><br></pre></td></tr></table></figure>
+
+<p>QueryJdbcAuthenticationProperties中有一个加密的对象PasswordEncoderProperties，主要支持如下几种加密方式：</p>
+<ul>
+<li><strong>NONE</strong> 不加密(默认的)</li>
+<li><strong>DEFAULT</strong> 使用encodingAlgorithm来定义加密方式（MD5,SHA）</li>
+<li><strong>STANDARD</strong> 标准加密，使用1024的SHA-256散列迭代和随机8字节随机盐值进行加密。</li>
+<li><strong>BCRYPT</strong> 使用BCryptPasswordEncoder方法加密</li>
+<li><strong>SCRYPT</strong> 使用SCryptPasswordEncoder方法加密</li>
+<li><strong>PBKDF2</strong> 使用Pbkdf2PasswordEncoder方法加密</li>
+</ul>
+<p>最开始使用的<strong>DEFAULT</strong>，使用的是MD5，而且并未做加盐的处理，是可以进行破解的，感兴趣的话，可以在<a href="https://www.somd5.com/" target="_blank" rel="noopener">这里</a>进行尝试，将e10adc3949ba59abbe56e057f20f883e输入进行解密，可以看到返回的结果是123456</p>
+<p>现在将加密现在更新为<strong>BCRYPT</strong></p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#更新加密策略，使用BCRYPT，增强安全性</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].passwordEncoder.type</span>=<span class="string">BCRYPT</span></span><br><span class="line"><span class="meta">cas.authn.jdbc.query[0].passwordEncoder.characterEncoding</span>=<span class="string">UTF-8</span></span><br></pre></td></tr></table></figure>
+
+<p>变更加密策略之后还需要更新数据中的密码的字符串，可以通过new BCryptPasswordEncoder().encode(“123456”)得到对应的加密结果</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> cas_user_base <span class="keyword">SET</span> user_psd = <span class="string">'$2a$10$8GhWjgG4j2Ot15inivAAW.bmzAeu.If9J8HEV6j/jbI37.8GLwS2W'</span></span><br></pre></td></tr></table></figure>
+
+<p>通过实现org.springframework.security.crypto.password.PasswordEncoder扩展加密算法，此时需要配置cas.authn.jdbc.query[0].passwordEncoder.type=你实现类的全限定名。</p>
+<p>本文涉及的src以及pom.xml文件已经放到<a href="https://github.com/david4It/cus_cas_server" target="_blank" rel="noopener">github</a></p>
+
+      
+      <!-- reward -->
+      
+    </div>
+    
+    
+      <!-- copyright -->
+      
+        <div class="declare">
+          <ul class="post-copyright">
+            <li>
+              <i class="ri-copyright-line"></i>
+              <strong>Copyright： </strong>
+              Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source.
+            </li>
+          </ul>
+        </div>
+        
+    <footer class="article-footer">
+      
+          
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://yoursite.com/2020/06/02/ckb0khpra0008twvjf1fl6bob/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CAS/" rel="tag">CAS</a></li></ul>
+
+
+    </footer>
+
+  </div>
+
+  
+  
+  <nav class="article-nav">
+    
+      <a href="/2020/06/03/ckb0khpr90007twvjc15xboq3/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            单点登录（三）
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2020/06/01/ckb0khpqp0000twvjceb1c0fy/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">单点登录（一）</div>
+      </a>
+    
+  </nav>
+
+
+  
+
+  
+  
+<!-- valine评论 -->
+<div id="vcomments-box">
+    <div id="vcomments">
+    </div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+<script>
+    new Valine({
+        el: '#vcomments',
+        app_id: '',
+        app_key: '',
+        path: window.location.pathname,
+        notify: false,
+        verify: false,
+        avatar: 'monsterid',
+        placeholder: '给我的文章加点评论吧~',
+        recordIP: true
+    });
+    const infoEle = document.querySelector('#vcomments .info');
+    if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+        infoEle.childNodes.forEach(function (item) {
+            item.parentNode.removeChild(item);
+        });
+    }
+</script>
+<style>
+    #vcomments-box {
+        padding: 5px 30px;
+    }
+
+    @media screen and (max-width: 800px) {
+        #vcomments-box {
+            padding: 5px 0px;
+        }
+    }
+
+    #vcomments-box #vcomments {
+        background-color: #fff;
+    }
+
+    .v .vlist .vcard .vh {
+        padding-right: 20px;
+    }
+
+    .v .vlist .vcard {
+        padding-left: 10px;
+    }
+</style>
+
+  
+
+  
+  
+  
+
+</article>
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2020
+        <i class="ri-heart-fill heart_icon"></i> David
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        
+        Powered by <a href="https://hexo.io" target="_blank">Hexo</a>
+        <span class="division">|</span>
+        Theme - <a href="https://github.com/Shen-Yu/hexo-theme-ayer" target="_blank">Ayer</a>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>Visitors:<span id="busuanzi_value_site_uv"></span></s>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>Views:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>
+      <div class="float_btns">
+        <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+      </div>
+    </main>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-side.svg" alt="唯"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="Search">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <script>
+      if (window.matchMedia("(max-width: 768px)").matches) {
+        document.querySelector('.content').classList.remove('on');
+        document.querySelector('.sidebar').classList.remove('on');
+      }
+    </script>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Subtitle -->
+
+<script>
+  try {
+    var typed = new Typed("#subtitle", {
+      strings: ['面朝大海，春暖花开', '愿你一生努力，一生被爱', '想要的都拥有，得不到的都释怀'],
+      startDelay: 0,
+      typeSpeed: 200,
+      loop: true,
+      backSpeed: 100,
+      showCursor: true
+    });
+  } catch (err) {
+    console.log(err)
+  }
+</script>
+
+<!-- Tocbot -->
+
+
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: 'main',
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto'
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
+<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css">
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script>
+
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+
+
+<link rel="stylesheet" href="/css/clipboard.css">
+
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+
+
+<!-- CanvasBackground -->
+
+
+    
+    
+    
+      
+  </div>
+</body>
+
+</html>
