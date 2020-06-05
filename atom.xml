@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2020-06-04T09:50:33.766Z</updated>
+  <updated>2020-06-05T09:46:33.728Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -17,11 +17,32 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>单点登录（四）</title>
+    <link href="http://yoursite.com/2020/06/05/ckb20y8tk0008iwvjhteucvth/"/>
+    <id>http://yoursite.com/2020/06/05/ckb20y8tk0008iwvjhteucvth/</id>
+    <published>2020-06-05T02:30:48.000Z</published>
+    <updated>2020-06-05T09:46:33.728Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h3&gt;&lt;p&gt;经过之前几篇文章的介绍以及Demo项目的搭建，加深了对CAS概念的理解，掌握了基础的应用方式。本文主要是从代码层面上对整个认证流程进行一个梳理，加深我们对CAS框架认证流程的一个认识。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="CAS" scheme="http://yoursite.com/categories/CAS/"/>
+    
+    
+      <category term="CAS" scheme="http://yoursite.com/tags/CAS/"/>
+    
+  </entry>
+  
+  <entry>
     <title>单点登录（三）</title>
-    <link href="http://yoursite.com/2020/06/03/ckb0lnlkc0007pwvj3x161ub4/"/>
-    <id>http://yoursite.com/2020/06/03/ckb0lnlkc0007pwvj3x161ub4/</id>
+    <link href="http://yoursite.com/2020/06/03/ckb20y8tj0007iwvj7y7hc6qh/"/>
+    <id>http://yoursite.com/2020/06/03/ckb20y8tj0007iwvj7y7hc6qh/</id>
     <published>2020-06-03T09:51:08.000Z</published>
-    <updated>2020-06-04T09:50:33.766Z</updated>
+    <updated>2020-06-05T05:27:11.662Z</updated>
     
     <summary type="html">
     
@@ -39,8 +60,8 @@
   
   <entry>
     <title>单点登录（二）</title>
-    <link href="http://yoursite.com/2020/06/02/ckb0lnlkd0008pwvj9wsg3jfd/"/>
-    <id>http://yoursite.com/2020/06/02/ckb0lnlkd0008pwvj9wsg3jfd/</id>
+    <link href="http://yoursite.com/2020/06/02/ckb20y8tl000aiwvjf174585x/"/>
+    <id>http://yoursite.com/2020/06/02/ckb20y8tl000aiwvjf174585x/</id>
     <published>2020-06-02T08:28:46.000Z</published>
     <updated>2020-06-04T09:15:18.624Z</updated>
     
@@ -60,8 +81,8 @@
   
   <entry>
     <title>单点登录（一）</title>
-    <link href="http://yoursite.com/2020/06/01/ckb0lnljb0000pwvjh30rh4kq/"/>
-    <id>http://yoursite.com/2020/06/01/ckb0lnljb0000pwvjh30rh4kq/</id>
+    <link href="http://yoursite.com/2020/06/01/ckb20y8t50001iwvjer42de92/"/>
+    <id>http://yoursite.com/2020/06/01/ckb20y8t50001iwvjer42de92/</id>
     <published>2020-06-01T06:08:33.000Z</published>
     <updated>2020-06-04T09:12:40.427Z</updated>
     
