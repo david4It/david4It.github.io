@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>Centos下使用Docker部署MySql</title>
-    <url>/2020/06/19/ckblykiye0000kcvjfo5lb4m2/</url>
+    <url>/2020/06/19/ckbt09m8k0000l0vjhoy165hc/</url>
     <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>在centos服务器上，基于docker安装mysql8并对外提供服务，主要记录一下基本的安装部署流程，以及整个过程中所遇到的问题。</p>
 <a id="more"></a>
 
@@ -17,7 +17,7 @@
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 首先需要创建好路径，否则会报错！如[&#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;]，创建好路径之后，使用chmod指令赋予权限，避免权限不足导致的容器启动报错</span><br><span class="line"></span><br><span class="line"># 端口映射，容器端口和服务器端口</span><br><span class="line">-p 3306:3306 \</span><br><span class="line"></span><br><span class="line"># 数据库启动之后的初始root密码</span><br><span class="line">-e MYSQL_ROOT_PASSWORD&#x3D;Passw0rd</span><br><span class="line"></span><br><span class="line"># mysqld用于存放mysql启动之后生成的mysql.socket对象，遇到了启动后报错： Can&#39;t connect to local MySQL server through socket &#39;&#x2F;var&#x2F;run&#x2F;mysqld&#x2F;mysqld.sock&#39; (2)，可以通过映射来解决</span><br><span class="line">-v &#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;mysqld:&#x2F;var&#x2F;run&#x2F;mysqld:rw \</span><br><span class="line"></span><br><span class="line"># 数据库文件存放的地方。必须要挂载到服务器，否则容器重启一切数据消失。</span><br><span class="line">-v &#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;data:&#x2F;var&#x2F;lib&#x2F;mysql:rw \</span><br><span class="line"></span><br><span class="line">#  是数据库主生的log。建议挂载到服务器</span><br><span class="line">-v &#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;log:&#x2F;var&#x2F;log&#x2F;mysql:rw \</span><br><span class="line"></span><br><span class="line">#  是数据库的配置文件，建议挂载到服务器，方便配置</span><br><span class="line">-v &#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;config&#x2F;my.cnf:&#x2F;etc&#x2F;mysql&#x2F;my.cnf:rw \</span><br><span class="line"></span><br><span class="line"># 是让容器的时钟与宿主机时钟同步，避免时区的问题，ro是read only</span><br><span class="line">-v &#x2F;etc&#x2F;localtime:&#x2F;etc&#x2F;localtime:ro \</span><br><span class="line"></span><br><span class="line"># 容器名</span><br><span class="line">--name mysql8 \</span><br><span class="line"></span><br><span class="line"># 挂掉之后自动重启</span><br><span class="line">--restart&#x3D;always \</span><br><span class="line"></span><br><span class="line"># -d 后台启动</span><br><span class="line">-d mysql</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>my.cnf配置文件</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># Copyright (c) 2017, Oracle and&#x2F;or its affiliates. All rights reserved.</span><br><span class="line">#</span><br><span class="line"># This program is free software; you can redistribute it and&#x2F;or modify</span><br><span class="line"># it under the terms of the GNU General Public License as published by</span><br><span class="line"># the Free Software Foundation; version 2 of the License.</span><br><span class="line">#</span><br><span class="line"># This program is distributed in the hope that it will be useful,</span><br><span class="line"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span><br><span class="line"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span><br><span class="line"># GNU General Public License for more details.</span><br><span class="line">#</span><br><span class="line"># You should have received a copy of the GNU General Public License</span><br><span class="line"># along with this program; if not, write to the Free Software</span><br><span class="line"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA</span><br><span class="line"></span><br><span class="line">#</span><br><span class="line"># The MySQL  Server configuration file.</span><br><span class="line">#</span><br><span class="line"># For explanations see</span><br><span class="line"># http:&#x2F;&#x2F;dev.mysql.com&#x2F;doc&#x2F;mysql&#x2F;en&#x2F;server-system-variables.html</span><br><span class="line"></span><br><span class="line">[mysqld]</span><br><span class="line">pid-file        &#x3D; &#x2F;var&#x2F;run&#x2F;mysqld&#x2F;mysqld.pid</span><br><span class="line">socket          &#x3D; &#x2F;var&#x2F;run&#x2F;mysqld&#x2F;mysqld.sock</span><br><span class="line">datadir         &#x3D; &#x2F;var&#x2F;lib&#x2F;mysql</span><br><span class="line">secure-file-priv&#x3D; NULL</span><br><span class="line"># Disabling symbolic-links is recommended to prevent assorted security risks</span><br><span class="line">symbolic-links&#x3D;0</span><br><span class="line"></span><br><span class="line"># Custom config should go here</span><br><span class="line">!includedir &#x2F;etc&#x2F;mysql&#x2F;conf.d&#x2F;</span><br><span class="line"># mysql8的安全机制升级而需要修改的配置，不配置的话将无法登录管理</span><br><span class="line">default_authentication_plugin&#x3D; mysql_native_password</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># Copyright (c) 2017, Oracle and&#x2F;or its affiliates. All rights reserved.</span><br><span class="line">#</span><br><span class="line"># This program is free software; you can redistribute it and&#x2F;or modify</span><br><span class="line"># it under the terms of the GNU General Public License as published by</span><br><span class="line"># the Free Software Foundation; version 2 of the License.</span><br><span class="line">#</span><br><span class="line"># This program is distributed in the hope that it will be useful,</span><br><span class="line"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span><br><span class="line"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span><br><span class="line"># GNU General Public License for more details.</span><br><span class="line">#</span><br><span class="line"># You should have received a copy of the GNU General Public License</span><br><span class="line"># along with this program; if not, write to the Free Software</span><br><span class="line"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA</span><br><span class="line"></span><br><span class="line">#</span><br><span class="line"># The MySQL  Server configuration file.</span><br><span class="line">#</span><br><span class="line"># For explanations see</span><br><span class="line"># http:&#x2F;&#x2F;dev.mysql.com&#x2F;doc&#x2F;mysql&#x2F;en&#x2F;server-system-variables.html</span><br><span class="line"></span><br><span class="line">[mysqld]</span><br><span class="line">pid-file        &#x3D; &#x2F;var&#x2F;run&#x2F;mysqld&#x2F;mysqld.pid</span><br><span class="line">socket          &#x3D; &#x2F;var&#x2F;run&#x2F;mysqld&#x2F;mysqld.sock</span><br><span class="line">datadir         &#x3D; &#x2F;var&#x2F;lib&#x2F;mysql</span><br><span class="line"># 忽略数据库表的大小写，这个配置必须在初始化的时候开启，等数据库初始化完成之后，再添加会报错：</span><br><span class="line"># Different lower_case_table_names settings for server (&#39;1&#39;) and data dictionary(&#39;0&#39;).</span><br><span class="line">lower_case_table_names &#x3D; 1</span><br><span class="line">secure-file-priv&#x3D; NULL</span><br><span class="line"># Disabling symbolic-links is recommended to prevent assorted security risks</span><br><span class="line">symbolic-links&#x3D;0</span><br><span class="line"></span><br><span class="line"># Custom config should go here</span><br><span class="line">!includedir &#x2F;etc&#x2F;mysql&#x2F;conf.d&#x2F;</span><br><span class="line"># mysql8的安全机制升级而需要修改的配置，不配置的话将无法登录管理</span><br><span class="line">default_authentication_plugin&#x3D; mysql_native_password</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>mysql配置</p>
 <ul>
@@ -73,7 +73,7 @@
   </entry>
   <entry>
     <title>单点登录（一）</title>
-    <url>/2020/06/01/ckblykiyl0002kcvj1qo7gjei/</url>
+    <url>/2020/06/01/ckbt09m8r0002l0vjfd3u276h/</url>
     <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>在分布式环境中，存在多个子系统，每个子系统独立部署。当用户登录其中一个系统之后，若需要访问另一个系统，使用传统方式session的话，就需要用户登录，一旦子系统数量众多，那么用户则需要在多个系统中进行登录，用户体验相当差。</p>
 <a id="more"></a>
 
@@ -127,8 +127,105 @@
       </tags>
   </entry>
   <entry>
+    <title>单点登录（四）</title>
+    <url>/2020/06/05/ckbt09m95000gl0vj6f9v9m5d/</url>
+    <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>经过之前几篇文章的介绍以及Demo项目的搭建，加深了对CAS概念的理解，掌握了基础的应用方式。本文主要是从代码层面上对整个认证流程进行一个梳理，加深我们对CAS框架认证流程的一个认识。</p>
+<a id="more"></a>
+
+<h3 id="后端认证流程"><a href="#后端认证流程" class="headerlink" title="后端认证流程"></a>后端认证流程</h3><p>本文基于客户端中的<a href="https://github.com/david4It/cas_clients" target="_blank" rel="noopener">messageServer</a>和CAS Server交互的示例进行演示。</p>
+<h4 id="跳转认证中心"><a href="#跳转认证中心" class="headerlink" title="跳转认证中心"></a>跳转认证中心</h4><p>修改security配置文件，开启security debug模式，打印调用链，方便追踪</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@EnableWebSecurity</span>(debug = <span class="keyword">true</span>)</span><br></pre></td></tr></table></figure>
+
+<p>在客户端项目中，配置了一个名为AuthenticationEntryPoint的bean，其代码如下</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="meta">@Primary</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> AuthenticationEntryPoint <span class="title">authenticationEntryPoint</span><span class="params">(ServiceProperties sp)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//定义登陆页面为CAS服务器</span></span><br><span class="line">    CasAuthenticationEntryPoint entryPoint = <span class="keyword">new</span> CasAuthenticationEntryPoint();</span><br><span class="line">    entryPoint.setLoginUrl(serverLoginUrl);</span><br><span class="line">    entryPoint.setServiceProperties(sp);</span><br><span class="line">    <span class="keyword">return</span> entryPoint;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在security的配置文件CustomSecurityConfig(extend WebSecurityConfigurerAdapter)进行了配置</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(HttpSecurity http)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">				...</span><br><span class="line">                </span><br><span class="line">                .exceptionHandling().authenticationEntryPoint(entryPoint).and()</span><br><span class="line">                </span><br><span class="line">                 ...</span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>启动好客户端和CAS服务之后，访问客户端页面，可以在控制台看到拦截器的情况</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Security filter chain: [</span><br><span class="line">  WebAsyncManagerIntegrationFilter</span><br><span class="line">  SecurityContextPersistenceFilter</span><br><span class="line">  HeaderWriterFilter</span><br><span class="line">  LogoutFilter</span><br><span class="line">  SingleSignOutFilter</span><br><span class="line">  CasAuthenticationFilter</span><br><span class="line">  RequestCacheAwareFilter</span><br><span class="line">  SecurityContextHolderAwareRequestFilter</span><br><span class="line">  AnonymousAuthenticationFilter</span><br><span class="line">  SessionManagementFilter</span><br><span class="line">  ExceptionTranslationFilter</span><br><span class="line">  FilterSecurityInterceptor</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<p>由于authenticationEntryPoint是添加在exceptionHandling()之后的，即当访问敏感资源被拦截，导致异常的时候，交由authenticationEntryPoint来处理。</p>
+<p><img src="/images/sso/7.png" alt="avatar"></p>
+<p>至此客户端的访问就会被重定向到CAS认证中心。不仅如此，还定义好了认证中心完成认证之后，重定向到客户端的路径为/login/cas。</p>
+<h4 id="客户端认证"><a href="#客户端认证" class="headerlink" title="客户端认证"></a>客户端认证</h4><p>在CAS服务器上输入用户名和密码之后，会重定向到客户端的/login/cas，被客户端的FilterChains拦截器链拦截。</p>
+<ul>
+<li><p>/login/cas路径会匹配上AbstractAuthenticationProcessingFilter拦截器，即CasAuthenticationFilter的父类</p>
+</li>
+<li><p>AbstractAuthenticationProcessingFilter调用attemptAuthentication方法进行认证。这是一个抽象方法，由CasAuthenticationFilter实现</p>
+</li>
+<li><p>attemptAuthentication方法内会构造UsernamePasswordAuthenticationToken对象，然后调用AuthenticationManager对token进行认证</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> Authentication <span class="title">attemptAuthentication</span><span class="params">(<span class="keyword">final</span> HttpServletRequest request,</span></span></span><br><span class="line"><span class="function"><span class="params">			<span class="keyword">final</span> HttpServletResponse response)</span> <span class="keyword">throws</span> AuthenticationException,</span></span><br><span class="line"><span class="function">			IOException </span>&#123;</span><br><span class="line">		<span class="comment">// if the request is a proxy request process it and return null to indicate the</span></span><br><span class="line">		<span class="comment">// request has been processed</span></span><br><span class="line">		<span class="keyword">if</span> (proxyReceptorRequest(request)) &#123;</span><br><span class="line">			logger.debug(<span class="string">"Responding to proxy receptor request"</span>);</span><br><span class="line">			CommonUtils.readAndRespondToProxyReceptorRequest(request, response,</span><br><span class="line">					<span class="keyword">this</span>.proxyGrantingTicketStorage);</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//验证是否为serviceTicketRequest</span></span><br><span class="line">		<span class="keyword">final</span> <span class="keyword">boolean</span> serviceTicketRequest = serviceTicketRequest(request, response);</span><br><span class="line">		<span class="keyword">final</span> String username = serviceTicketRequest ? CAS_STATEFUL_IDENTIFIER</span><br><span class="line">				: CAS_STATELESS_IDENTIFIER;</span><br><span class="line">		String password = obtainArtifact(request);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (password == <span class="keyword">null</span>) &#123;</span><br><span class="line">			logger.debug(<span class="string">"Failed to obtain an artifact (cas ticket)"</span>);</span><br><span class="line">			password = <span class="string">""</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//构建token</span></span><br><span class="line">		<span class="keyword">final</span> UsernamePasswordAuthenticationToken authRequest = <span class="keyword">new</span> UsernamePasswordAuthenticationToken(</span><br><span class="line">				username, password);</span><br><span class="line"></span><br><span class="line">		authRequest.setDetails(authenticationDetailsSource.buildDetails(request));</span><br><span class="line"></span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">this</span>.getAuthenticationManager().authenticate(authRequest);</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<ul>
+<li><p>AuthenticationManager中保存了一个AuthenticationProvider对象集合，循环调用集合中的provider对token进行验证。</p>
+<ul>
+<li><p>在CASAutoConfig配置文件中定义了provider的信息，所以可以确定AuthenticationManager用于token验证的provider为CasAuthenticationProvider。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">   <span class="meta">@Bean</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> TicketValidator <span class="title">ticketValidator</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       <span class="comment">//定义验证ticket的服务器地址</span></span><br><span class="line">       <span class="keyword">return</span> <span class="keyword">new</span> Cas30ProxyTicketValidator(serverUrlPrefix);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> CasAuthenticationProvider <span class="title">authenticationProvider</span><span class="params">(ServiceProperties sp, TicketValidator validator, UserDetailsService userDetailsService)</span> </span>&#123;</span><br><span class="line">       CasAuthenticationProvider provider = <span class="keyword">new</span> CasAuthenticationProvider();</span><br><span class="line">       provider.setTicketValidator(validator);</span><br><span class="line">       provider.setServiceProperties(sp);</span><br><span class="line">       provider.setKey(<span class="string">"david4it"</span>);</span><br><span class="line">       provider.setUserDetailsService(userDetailsService);</span><br><span class="line">       <span class="keyword">return</span> provider;</span><br><span class="line">   &#125;</span><br><span class="line">    </span><br><span class="line">   <span class="meta">@Bean</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> CasAuthenticationFilter <span class="title">casAuthenticationFilter</span><span class="params">(ServiceProperties sp, AuthenticationProvider provider)</span> </span>&#123;</span><br><span class="line">       CasAuthenticationFilter filter = <span class="keyword">new</span> CasAuthenticationFilter();</span><br><span class="line">       filter.setServiceProperties(sp);</span><br><span class="line">       filter.setAuthenticationManager(<span class="keyword">new</span> ProviderManager(Arrays.asList(provider)));</span><br><span class="line">       <span class="keyword">return</span> filter;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>CasAuthenticationProvider的authenticate方法中会调用authenticateNow方法</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> CasAuthenticationToken <span class="title">authenticateNow</span><span class="params">(<span class="keyword">final</span> Authentication authentication)</span></span></span><br><span class="line"><span class="function">		<span class="keyword">throws</span> AuthenticationException </span>&#123;</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">           <span class="comment">//这里的ticketValidator对象是Cas30ProxyTicketValidator，调用validate方法会发起一个请求，向CAS认证中心对token信息进行校验</span></span><br><span class="line">           <span class="comment">//assertion中包含了如下信息</span></span><br><span class="line">           <span class="comment">/**</span></span><br><span class="line"><span class="comment">           validFromDate = &#123;Date@6702&#125; "Fri Jun 05 14:04:26 CST 2020"</span></span><br><span class="line"><span class="comment">		validUntilDate = null</span></span><br><span class="line"><span class="comment">		authenticationDate = &#123;Date@6703&#125; "Fri Jun 05 14:04:26 CST 2020"</span></span><br><span class="line"><span class="comment">		attributes = &#123;Collections$EmptyMap@6704&#125;  size = 0</span></span><br><span class="line"><span class="comment">		principal = &#123;AttributePrincipalImpl@6705&#125; "admin"</span></span><br><span class="line"><span class="comment">		**/</span></span><br><span class="line">		<span class="keyword">final</span> Assertion assertion = <span class="keyword">this</span>.ticketValidator.validate(authentication</span><br><span class="line">				.getCredentials().toString(), getServiceUrl(authentication));</span><br><span class="line">           <span class="comment">//由于客户端系统使用的是InMemoryUserDetailsManager保存用户信息，所以会使用InMemoryUserDetailsManager以assertion的principal作为用户名进行查询，不对密码进行校验。</span></span><br><span class="line">           <span class="keyword">final</span> UserDetails userDetails = loadUserByAssertion(assertion);</span><br><span class="line">           <span class="comment">//判定客户端系统对应的用户信息，如过期，锁定，无效等</span></span><br><span class="line">		userDetailsChecker.check(userDetails);</span><br><span class="line">           <span class="comment">//生成一个新的CasAuthenticationToken</span></span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> CasAuthenticationToken(<span class="keyword">this</span>.key, userDetails,</span><br><span class="line">				authentication.getCredentials(),</span><br><span class="line">				authoritiesMapper.mapAuthorities(userDetails.getAuthorities()),</span><br><span class="line">				userDetails, assertion);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">catch</span> (<span class="keyword">final</span> TicketValidationException e) &#123;</span><br><span class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> BadCredentialsException(e.getMessage(), e);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>整个客户端的认证流程就完成了</p>
+<h4 id="单点登陆其他系统"><a href="#单点登陆其他系统" class="headerlink" title="单点登陆其他系统"></a>单点登陆其他系统</h4><p>当用户登陆系统A的时候，已经在CAS认证中心完成登录了，那么登陆messageServer的时候，流程是怎样的，一起来看一下。</p>
+<ul>
+<li>从系统A跳转到messageServer系统的首页，首先会经过messageServer的拦截器链，判定用户没有登录，会根据AuthenticationEntryPoint的配置，重定向到登陆页面</li>
+<li>由于系统A已经完成了登陆，在CAS认证中心保存了信息，并且messageServer作为客户端已经注册到CAS认证中心了，在重定向的时候，就无需登录，直接重定向到messageServer的/login/cas页面，接着执行客户端认证的步骤，即ticket有效性检验</li>
+<li>完成客户端认证之后，就在messageServer中完成了登陆</li>
+</ul>
+<h4 id="登出"><a href="#登出" class="headerlink" title="登出"></a>登出</h4><p>当用户登出系统A的时候，CAS认证中心会查找所有登陆过的子系统，并向他们发送logout的报文进行登出操作。</p>
+<ul>
+<li><p>当系统A执行登出操作的时候，messageServer会收到一个/login/cas的请求</p>
+</li>
+<li><p>这个请求在SingleSignOutFilter拦截进行处理，解析request为登出操作</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doFilter</span><span class="params">(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)</span> <span class="keyword">throws</span> IOException, ServletException </span>&#123;</span><br><span class="line">        HttpServletRequest request = (HttpServletRequest)servletRequest;</span><br><span class="line">        HttpServletResponse response = (HttpServletResponse)servletResponse;</span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">this</span>.handlerInitialized.getAndSet(<span class="keyword">true</span>)) &#123;</span><br><span class="line">            HANDLER.init();</span><br><span class="line">        &#125;</span><br><span class="line">		<span class="comment">//处理process方法，在方法中判定request是一个登出请求</span></span><br><span class="line">        <span class="keyword">if</span> (HANDLER.process(request, response)) &#123;</span><br><span class="line">            filterChain.doFilter(servletRequest, servletResponse);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">--------------------------------------------------------</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">process</span><span class="params">(HttpServletRequest request, HttpServletResponse response)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.isTokenRequest(request)) &#123;</span><br><span class="line">            <span class="keyword">this</span>.logger.trace(<span class="string">"Received a token request"</span>);</span><br><span class="line">            <span class="keyword">this</span>.recordSession(request);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">this</span>.isLogoutRequest(request)) &#123;</span><br><span class="line">            <span class="keyword">this</span>.logger.trace(<span class="string">"Received a logout request"</span>);</span><br><span class="line">            <span class="keyword">this</span>.destroySession(request);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">this</span>.logger.trace(<span class="string">"Ignoring URI for logout: &#123;&#125;"</span>, request.getRequestURI());</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>当再次刷新messageServer页面的时候，又会被重定向到CAS认证中心登陆页面</p>
+</li>
+</ul>
+<h3 id="前端Ticket传递"><a href="#前端Ticket传递" class="headerlink" title="前端Ticket传递"></a>前端Ticket传递</h3><ul>
+<li>CAS相关名词<ul>
+<li>TGT：Ticket Granted Ticket（票根，可以签发ST）</li>
+<li>TGC：Ticket Granted Cookie（cookie中CASTGC的value），存在Cookie中，可以通过他找到TGT。</li>
+<li>ST：Service Ticket，是TGT生成的，是每个应用的票据，就是流程中的ticket。</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p>第一次登录客户端A页面，被重定向到CAS认证中心</p>
+<p><img src="/images/sso/8.png" alt="avatar"></p>
+</li>
+<li><p>CAS认证中心登陆完成后，会重定向到客户端A页面，客户端后端会拿到ticket进行校验处理。</p>
+<p>向cookie中添加该值的目的是当下次访问CAS认证系统时，浏览器将Cookie中的TGC携带到服务器，服务器根据这个TGC，查找与之对应的TGT。从而判断用户是否登录过了，是否需要展示登录页面。TGT与TGC的关系就像SESSION与Cookie中SESSIONID的关系。</p>
+<p><img src="/images/sso/9.png" alt="avatar"></p>
+</li>
+<li><p>ticket校验通过，再重定向到客户端A页面，完成登录</p>
+<p><img src="/images/sso/10.png" alt="avatar"></p>
+</li>
+<li><p>当用户第二次访问，仍然会经过AuthenticationFilter过滤器，但与第一次访问不同的是此时客户端A的session中已经存在用户的信息，浏览器中的Cookie会根据SessionID找到Session，获取用户信息，所以不需要进行验证，可以直接访问。</p>
+</li>
+<li><p>已经登录了客户端A，访问客户端B页面，按照客户端B拦截器的配置，会首先重定向到CAS认证中心，CAS认证中心已经注册了客户端B，并且客户端A已经登录了，CAS认证中心会直接向客户端B返回带ticket的请求，由客户端B进行ticket的校验，校验通过之后，客户端B就登录成功了。</p>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>CAS</category>
+      </categories>
+      <tags>
+        <tag>CAS</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>单点登录（三）</title>
-    <url>/2020/06/03/ckblykiyx000gkcvjb3steure/</url>
+    <url>/2020/06/03/ckbt09m96000hl0vjdm8kdrpk/</url>
     <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>CAS Server的基本定制已经完成，接下来就需要对Client进行开发和测试，保证整个业务流程的正确性。这里通过两个client项目进行演示：其中一个项目使用filter方式进行认证；而另一个项目则采用spring security cas的方式进行认证。</p>
 <a id="more"></a>
 
@@ -222,7 +319,7 @@
   </entry>
   <entry>
     <title>单点登录（二）</title>
-    <url>/2020/06/02/ckblykiyy000hkcvj00uwc2km/</url>
+    <url>/2020/06/02/ckbt09m97000jl0vj8xjxhoz0/</url>
     <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>已经对SSO以及CAS的基本概念和流程有了一定了解之后，就可以开始着手实现自己的CAS认证服务器了。本文主要讲解如何在本地使用HTTPS的方式启动CAS Server，以及定制CAS Server的部分页面。</p>
 <a id="more"></a>
 
@@ -361,105 +458,8 @@
       </tags>
   </entry>
   <entry>
-    <title>单点登录（四）</title>
-    <url>/2020/06/05/ckblykiyy000jkcvj5e2kg528/</url>
-    <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>经过之前几篇文章的介绍以及Demo项目的搭建，加深了对CAS概念的理解，掌握了基础的应用方式。本文主要是从代码层面上对整个认证流程进行一个梳理，加深我们对CAS框架认证流程的一个认识。</p>
-<a id="more"></a>
-
-<h3 id="后端认证流程"><a href="#后端认证流程" class="headerlink" title="后端认证流程"></a>后端认证流程</h3><p>本文基于客户端中的<a href="https://github.com/david4It/cas_clients" target="_blank" rel="noopener">messageServer</a>和CAS Server交互的示例进行演示。</p>
-<h4 id="跳转认证中心"><a href="#跳转认证中心" class="headerlink" title="跳转认证中心"></a>跳转认证中心</h4><p>修改security配置文件，开启security debug模式，打印调用链，方便追踪</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@EnableWebSecurity</span>(debug = <span class="keyword">true</span>)</span><br></pre></td></tr></table></figure>
-
-<p>在客户端项目中，配置了一个名为AuthenticationEntryPoint的bean，其代码如下</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="meta">@Primary</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> AuthenticationEntryPoint <span class="title">authenticationEntryPoint</span><span class="params">(ServiceProperties sp)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//定义登陆页面为CAS服务器</span></span><br><span class="line">    CasAuthenticationEntryPoint entryPoint = <span class="keyword">new</span> CasAuthenticationEntryPoint();</span><br><span class="line">    entryPoint.setLoginUrl(serverLoginUrl);</span><br><span class="line">    entryPoint.setServiceProperties(sp);</span><br><span class="line">    <span class="keyword">return</span> entryPoint;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在security的配置文件CustomSecurityConfig(extend WebSecurityConfigurerAdapter)进行了配置</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(HttpSecurity http)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">				...</span><br><span class="line">                </span><br><span class="line">                .exceptionHandling().authenticationEntryPoint(entryPoint).and()</span><br><span class="line">                </span><br><span class="line">                 ...</span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<p>启动好客户端和CAS服务之后，访问客户端页面，可以在控制台看到拦截器的情况</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Security filter chain: [</span><br><span class="line">  WebAsyncManagerIntegrationFilter</span><br><span class="line">  SecurityContextPersistenceFilter</span><br><span class="line">  HeaderWriterFilter</span><br><span class="line">  LogoutFilter</span><br><span class="line">  SingleSignOutFilter</span><br><span class="line">  CasAuthenticationFilter</span><br><span class="line">  RequestCacheAwareFilter</span><br><span class="line">  SecurityContextHolderAwareRequestFilter</span><br><span class="line">  AnonymousAuthenticationFilter</span><br><span class="line">  SessionManagementFilter</span><br><span class="line">  ExceptionTranslationFilter</span><br><span class="line">  FilterSecurityInterceptor</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
-
-<p>由于authenticationEntryPoint是添加在exceptionHandling()之后的，即当访问敏感资源被拦截，导致异常的时候，交由authenticationEntryPoint来处理。</p>
-<p><img src="/images/sso/7.png" alt="avatar"></p>
-<p>至此客户端的访问就会被重定向到CAS认证中心。不仅如此，还定义好了认证中心完成认证之后，重定向到客户端的路径为/login/cas。</p>
-<h4 id="客户端认证"><a href="#客户端认证" class="headerlink" title="客户端认证"></a>客户端认证</h4><p>在CAS服务器上输入用户名和密码之后，会重定向到客户端的/login/cas，被客户端的FilterChains拦截器链拦截。</p>
-<ul>
-<li><p>/login/cas路径会匹配上AbstractAuthenticationProcessingFilter拦截器，即CasAuthenticationFilter的父类</p>
-</li>
-<li><p>AbstractAuthenticationProcessingFilter调用attemptAuthentication方法进行认证。这是一个抽象方法，由CasAuthenticationFilter实现</p>
-</li>
-<li><p>attemptAuthentication方法内会构造UsernamePasswordAuthenticationToken对象，然后调用AuthenticationManager对token进行认证</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> Authentication <span class="title">attemptAuthentication</span><span class="params">(<span class="keyword">final</span> HttpServletRequest request,</span></span></span><br><span class="line"><span class="function"><span class="params">			<span class="keyword">final</span> HttpServletResponse response)</span> <span class="keyword">throws</span> AuthenticationException,</span></span><br><span class="line"><span class="function">			IOException </span>&#123;</span><br><span class="line">		<span class="comment">// if the request is a proxy request process it and return null to indicate the</span></span><br><span class="line">		<span class="comment">// request has been processed</span></span><br><span class="line">		<span class="keyword">if</span> (proxyReceptorRequest(request)) &#123;</span><br><span class="line">			logger.debug(<span class="string">"Responding to proxy receptor request"</span>);</span><br><span class="line">			CommonUtils.readAndRespondToProxyReceptorRequest(request, response,</span><br><span class="line">					<span class="keyword">this</span>.proxyGrantingTicketStorage);</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//验证是否为serviceTicketRequest</span></span><br><span class="line">		<span class="keyword">final</span> <span class="keyword">boolean</span> serviceTicketRequest = serviceTicketRequest(request, response);</span><br><span class="line">		<span class="keyword">final</span> String username = serviceTicketRequest ? CAS_STATEFUL_IDENTIFIER</span><br><span class="line">				: CAS_STATELESS_IDENTIFIER;</span><br><span class="line">		String password = obtainArtifact(request);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (password == <span class="keyword">null</span>) &#123;</span><br><span class="line">			logger.debug(<span class="string">"Failed to obtain an artifact (cas ticket)"</span>);</span><br><span class="line">			password = <span class="string">""</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//构建token</span></span><br><span class="line">		<span class="keyword">final</span> UsernamePasswordAuthenticationToken authRequest = <span class="keyword">new</span> UsernamePasswordAuthenticationToken(</span><br><span class="line">				username, password);</span><br><span class="line"></span><br><span class="line">		authRequest.setDetails(authenticationDetailsSource.buildDetails(request));</span><br><span class="line"></span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">this</span>.getAuthenticationManager().authenticate(authRequest);</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-</li>
-</ul>
-<ul>
-<li><p>AuthenticationManager中保存了一个AuthenticationProvider对象集合，循环调用集合中的provider对token进行验证。</p>
-<ul>
-<li><p>在CASAutoConfig配置文件中定义了provider的信息，所以可以确定AuthenticationManager用于token验证的provider为CasAuthenticationProvider。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">   <span class="meta">@Bean</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> TicketValidator <span class="title">ticketValidator</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       <span class="comment">//定义验证ticket的服务器地址</span></span><br><span class="line">       <span class="keyword">return</span> <span class="keyword">new</span> Cas30ProxyTicketValidator(serverUrlPrefix);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> CasAuthenticationProvider <span class="title">authenticationProvider</span><span class="params">(ServiceProperties sp, TicketValidator validator, UserDetailsService userDetailsService)</span> </span>&#123;</span><br><span class="line">       CasAuthenticationProvider provider = <span class="keyword">new</span> CasAuthenticationProvider();</span><br><span class="line">       provider.setTicketValidator(validator);</span><br><span class="line">       provider.setServiceProperties(sp);</span><br><span class="line">       provider.setKey(<span class="string">"david4it"</span>);</span><br><span class="line">       provider.setUserDetailsService(userDetailsService);</span><br><span class="line">       <span class="keyword">return</span> provider;</span><br><span class="line">   &#125;</span><br><span class="line">    </span><br><span class="line">   <span class="meta">@Bean</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> CasAuthenticationFilter <span class="title">casAuthenticationFilter</span><span class="params">(ServiceProperties sp, AuthenticationProvider provider)</span> </span>&#123;</span><br><span class="line">       CasAuthenticationFilter filter = <span class="keyword">new</span> CasAuthenticationFilter();</span><br><span class="line">       filter.setServiceProperties(sp);</span><br><span class="line">       filter.setAuthenticationManager(<span class="keyword">new</span> ProviderManager(Arrays.asList(provider)));</span><br><span class="line">       <span class="keyword">return</span> filter;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-<li><p>CasAuthenticationProvider的authenticate方法中会调用authenticateNow方法</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> CasAuthenticationToken <span class="title">authenticateNow</span><span class="params">(<span class="keyword">final</span> Authentication authentication)</span></span></span><br><span class="line"><span class="function">		<span class="keyword">throws</span> AuthenticationException </span>&#123;</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">           <span class="comment">//这里的ticketValidator对象是Cas30ProxyTicketValidator，调用validate方法会发起一个请求，向CAS认证中心对token信息进行校验</span></span><br><span class="line">           <span class="comment">//assertion中包含了如下信息</span></span><br><span class="line">           <span class="comment">/**</span></span><br><span class="line"><span class="comment">           validFromDate = &#123;Date@6702&#125; "Fri Jun 05 14:04:26 CST 2020"</span></span><br><span class="line"><span class="comment">		validUntilDate = null</span></span><br><span class="line"><span class="comment">		authenticationDate = &#123;Date@6703&#125; "Fri Jun 05 14:04:26 CST 2020"</span></span><br><span class="line"><span class="comment">		attributes = &#123;Collections$EmptyMap@6704&#125;  size = 0</span></span><br><span class="line"><span class="comment">		principal = &#123;AttributePrincipalImpl@6705&#125; "admin"</span></span><br><span class="line"><span class="comment">		**/</span></span><br><span class="line">		<span class="keyword">final</span> Assertion assertion = <span class="keyword">this</span>.ticketValidator.validate(authentication</span><br><span class="line">				.getCredentials().toString(), getServiceUrl(authentication));</span><br><span class="line">           <span class="comment">//由于客户端系统使用的是InMemoryUserDetailsManager保存用户信息，所以会使用InMemoryUserDetailsManager以assertion的principal作为用户名进行查询，不对密码进行校验。</span></span><br><span class="line">           <span class="keyword">final</span> UserDetails userDetails = loadUserByAssertion(assertion);</span><br><span class="line">           <span class="comment">//判定客户端系统对应的用户信息，如过期，锁定，无效等</span></span><br><span class="line">		userDetailsChecker.check(userDetails);</span><br><span class="line">           <span class="comment">//生成一个新的CasAuthenticationToken</span></span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> CasAuthenticationToken(<span class="keyword">this</span>.key, userDetails,</span><br><span class="line">				authentication.getCredentials(),</span><br><span class="line">				authoritiesMapper.mapAuthorities(userDetails.getAuthorities()),</span><br><span class="line">				userDetails, assertion);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">catch</span> (<span class="keyword">final</span> TicketValidationException e) &#123;</span><br><span class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> BadCredentialsException(e.getMessage(), e);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<p>整个客户端的认证流程就完成了</p>
-<h4 id="单点登陆其他系统"><a href="#单点登陆其他系统" class="headerlink" title="单点登陆其他系统"></a>单点登陆其他系统</h4><p>当用户登陆系统A的时候，已经在CAS认证中心完成登录了，那么登陆messageServer的时候，流程是怎样的，一起来看一下。</p>
-<ul>
-<li>从系统A跳转到messageServer系统的首页，首先会经过messageServer的拦截器链，判定用户没有登录，会根据AuthenticationEntryPoint的配置，重定向到登陆页面</li>
-<li>由于系统A已经完成了登陆，在CAS认证中心保存了信息，并且messageServer作为客户端已经注册到CAS认证中心了，在重定向的时候，就无需登录，直接重定向到messageServer的/login/cas页面，接着执行客户端认证的步骤，即ticket有效性检验</li>
-<li>完成客户端认证之后，就在messageServer中完成了登陆</li>
-</ul>
-<h4 id="登出"><a href="#登出" class="headerlink" title="登出"></a>登出</h4><p>当用户登出系统A的时候，CAS认证中心会查找所有登陆过的子系统，并向他们发送logout的报文进行登出操作。</p>
-<ul>
-<li><p>当系统A执行登出操作的时候，messageServer会收到一个/login/cas的请求</p>
-</li>
-<li><p>这个请求在SingleSignOutFilter拦截进行处理，解析request为登出操作</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doFilter</span><span class="params">(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)</span> <span class="keyword">throws</span> IOException, ServletException </span>&#123;</span><br><span class="line">        HttpServletRequest request = (HttpServletRequest)servletRequest;</span><br><span class="line">        HttpServletResponse response = (HttpServletResponse)servletResponse;</span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">this</span>.handlerInitialized.getAndSet(<span class="keyword">true</span>)) &#123;</span><br><span class="line">            HANDLER.init();</span><br><span class="line">        &#125;</span><br><span class="line">		<span class="comment">//处理process方法，在方法中判定request是一个登出请求</span></span><br><span class="line">        <span class="keyword">if</span> (HANDLER.process(request, response)) &#123;</span><br><span class="line">            filterChain.doFilter(servletRequest, servletResponse);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">--------------------------------------------------------</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">process</span><span class="params">(HttpServletRequest request, HttpServletResponse response)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.isTokenRequest(request)) &#123;</span><br><span class="line">            <span class="keyword">this</span>.logger.trace(<span class="string">"Received a token request"</span>);</span><br><span class="line">            <span class="keyword">this</span>.recordSession(request);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">this</span>.isLogoutRequest(request)) &#123;</span><br><span class="line">            <span class="keyword">this</span>.logger.trace(<span class="string">"Received a logout request"</span>);</span><br><span class="line">            <span class="keyword">this</span>.destroySession(request);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">this</span>.logger.trace(<span class="string">"Ignoring URI for logout: &#123;&#125;"</span>, request.getRequestURI());</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>当再次刷新messageServer页面的时候，又会被重定向到CAS认证中心登陆页面</p>
-</li>
-</ul>
-<h3 id="前端Ticket传递"><a href="#前端Ticket传递" class="headerlink" title="前端Ticket传递"></a>前端Ticket传递</h3><ul>
-<li>CAS相关名词<ul>
-<li>TGT：Ticket Granted Ticket（票根，可以签发ST）</li>
-<li>TGC：Ticket Granted Cookie（cookie中CASTGC的value），存在Cookie中，可以通过他找到TGT。</li>
-<li>ST：Service Ticket，是TGT生成的，是每个应用的票据，就是流程中的ticket。</li>
-</ul>
-</li>
-</ul>
-<ul>
-<li><p>第一次登录客户端A页面，被重定向到CAS认证中心</p>
-<p><img src="/images/sso/8.png" alt="avatar"></p>
-</li>
-<li><p>CAS认证中心登陆完成后，会重定向到客户端A页面，客户端后端会拿到ticket进行校验处理。</p>
-<p>向cookie中添加该值的目的是当下次访问CAS认证系统时，浏览器将Cookie中的TGC携带到服务器，服务器根据这个TGC，查找与之对应的TGT。从而判断用户是否登录过了，是否需要展示登录页面。TGT与TGC的关系就像SESSION与Cookie中SESSIONID的关系。</p>
-<p><img src="/images/sso/9.png" alt="avatar"></p>
-</li>
-<li><p>ticket校验通过，再重定向到客户端A页面，完成登录</p>
-<p><img src="/images/sso/10.png" alt="avatar"></p>
-</li>
-<li><p>当用户第二次访问，仍然会经过AuthenticationFilter过滤器，但与第一次访问不同的是此时客户端A的session中已经存在用户的信息，浏览器中的Cookie会根据SessionID找到Session，获取用户信息，所以不需要进行验证，可以直接访问。</p>
-</li>
-<li><p>已经登录了客户端A，访问客户端B页面，按照客户端B拦截器的配置，会首先重定向到CAS认证中心，CAS认证中心已经注册了客户端B，并且客户端A已经登录了，CAS认证中心会直接向客户端B返回带ticket的请求，由客户端B进行ticket的校验，校验通过之后，客户端B就登录成功了。</p>
-</li>
-</ul>
-]]></content>
-      <categories>
-        <category>CAS</category>
-      </categories>
-      <tags>
-        <tag>CAS</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Nacos配置中心</title>
-    <url>/2020/06/15/ckblykiza000pkcvj5l9h0cpm/</url>
+    <url>/2020/06/15/ckbt09m9k000pl0vj79453ile/</url>
     <content><![CDATA[<h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p>Nacos 致力于帮助您发现、配置和管理微服务。Nacos 提供了一组简单易用的特性集，帮助您快速实现动态服务发现、服务配置、服务元数据及流量管理。</p>
 <a id="more"></a>
 
