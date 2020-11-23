@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>Centos下使用Docker部署MySql</title>
-    <url>/2020/06/19/ckbt09m8k0000l0vjhoy165hc/</url>
+    <url>/2020/06/19/ckhuc25q8000124vj3fajdmxc/</url>
     <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>在centos服务器上，基于docker安装mysql8并对外提供服务，主要记录一下基本的安装部署流程，以及整个过程中所遇到的问题。</p>
 <a id="more"></a>
 
@@ -11,7 +11,7 @@
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker pull mysql</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>创建shell脚本文件，方便启动mysql服务</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">docker run \</span><br><span class="line">    -p 3306:3306 \</span><br><span class="line">    -e MYSQL_ROOT_PASSWORD&#x3D;Passw0rd \</span><br><span class="line">    -v &#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;mysqld:&#x2F;var&#x2F;run&#x2F;mysqld:rw \</span><br><span class="line">    -v &#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;data:&#x2F;var&#x2F;lib&#x2F;mysql:rw \</span><br><span class="line">    -v &#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;log:&#x2F;var&#x2F;log&#x2F;mysql:rw \</span><br><span class="line">    -v &#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;config&#x2F;my.cnf:&#x2F;etc&#x2F;mysql&#x2F;my.cnf:rw \</span><br><span class="line">    -v &#x2F;etc&#x2F;localtime:&#x2F;etc&#x2F;localtime:ro \</span><br><span class="line">    --name mysql8 \</span><br><span class="line">    --restart&#x3D;always \</span><br><span class="line">    -d mysql</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">docker run \</span><br><span class="line">    -p 3306:3306 \</span><br><span class="line">    -e MYSQL_ROOT_PASSWORD&#x3D;Passw0rd \</span><br><span class="line">    -v &#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;mysqld:&#x2F;var&#x2F;run&#x2F;mysqld:rw \</span><br><span class="line">    -v &#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;data:&#x2F;var&#x2F;lib&#x2F;mysql:rw \</span><br><span class="line">    -v &#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;log:&#x2F;var&#x2F;log&#x2F;mysql:rw \</span><br><span class="line">    -v &#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;config&#x2F;my.cnf:&#x2F;etc&#x2F;mysql&#x2F;my.cnf:rw \</span><br><span class="line">    -v &#x2F;home&#x2F;vsftp&#x2F;mysql&#x2F;mysql-files:&#x2F;var&#x2F;lib&#x2F;mysql-files:rw \</span><br><span class="line">    -v &#x2F;etc&#x2F;localtime:&#x2F;etc&#x2F;localtime:ro \</span><br><span class="line">    --name mysql8 \</span><br><span class="line">    --restart&#x3D;always \</span><br><span class="line">    -d mysql</span><br></pre></td></tr></table></figure>
 
 <p><strong>参数说明</strong></p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 首先需要创建好路径，否则会报错！如[&#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;]，创建好路径之后，使用chmod指令赋予权限，避免权限不足导致的容器启动报错</span><br><span class="line"></span><br><span class="line"># 端口映射，容器端口和服务器端口</span><br><span class="line">-p 3306:3306 \</span><br><span class="line"></span><br><span class="line"># 数据库启动之后的初始root密码</span><br><span class="line">-e MYSQL_ROOT_PASSWORD&#x3D;Passw0rd</span><br><span class="line"></span><br><span class="line"># mysqld用于存放mysql启动之后生成的mysql.socket对象，遇到了启动后报错： Can&#39;t connect to local MySQL server through socket &#39;&#x2F;var&#x2F;run&#x2F;mysqld&#x2F;mysqld.sock&#39; (2)，可以通过映射来解决</span><br><span class="line">-v &#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;mysqld:&#x2F;var&#x2F;run&#x2F;mysqld:rw \</span><br><span class="line"></span><br><span class="line"># 数据库文件存放的地方。必须要挂载到服务器，否则容器重启一切数据消失。</span><br><span class="line">-v &#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;data:&#x2F;var&#x2F;lib&#x2F;mysql:rw \</span><br><span class="line"></span><br><span class="line">#  是数据库主生的log。建议挂载到服务器</span><br><span class="line">-v &#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;log:&#x2F;var&#x2F;log&#x2F;mysql:rw \</span><br><span class="line"></span><br><span class="line">#  是数据库的配置文件，建议挂载到服务器，方便配置</span><br><span class="line">-v &#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;config&#x2F;my.cnf:&#x2F;etc&#x2F;mysql&#x2F;my.cnf:rw \</span><br><span class="line"></span><br><span class="line"># 是让容器的时钟与宿主机时钟同步，避免时区的问题，ro是read only</span><br><span class="line">-v &#x2F;etc&#x2F;localtime:&#x2F;etc&#x2F;localtime:ro \</span><br><span class="line"></span><br><span class="line"># 容器名</span><br><span class="line">--name mysql8 \</span><br><span class="line"></span><br><span class="line"># 挂掉之后自动重启</span><br><span class="line">--restart&#x3D;always \</span><br><span class="line"></span><br><span class="line"># -d 后台启动</span><br><span class="line">-d mysql</span><br></pre></td></tr></table></figure>
@@ -59,6 +59,13 @@
 <p>我所遇到的是第三种情况，当把centos中的防火墙关掉之后，就可以连接上了，开启就不行。后来经过如下操作，就可以正常进行连接了，也不用关闭防火墙</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo systemctl stop firewalld</span><br><span class="line">sudo systemctl restart docker</span><br><span class="line">sudo systemctl start firewalld</span><br></pre></td></tr></table></figure>
 
+
+</li>
+</ol>
+<ol start="3">
+<li><p>若mysql启动失败了，需要手动清除/home/vsftp/mysql/data路径下的数据库文件，否则启动会报错：</p>
+<p>docker mysql:Different lower_case_table_names settings for server (‘2‘) and data dictionary (‘0‘).</p>
+<p>原因在于只有第一次初始化数据库的时候在my.cnf中配置的lower_case_table_names = 1才起作用</p>
 </li>
 </ol>
 ]]></content>
@@ -73,7 +80,7 @@
   </entry>
   <entry>
     <title>单点登录（一）</title>
-    <url>/2020/06/01/ckbt09m8r0002l0vjfd3u276h/</url>
+    <url>/2020/06/01/ckhuc25qc000324vjgca9gu1z/</url>
     <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>在分布式环境中，存在多个子系统，每个子系统独立部署。当用户登录其中一个系统之后，若需要访问另一个系统，使用传统方式session的话，就需要用户登录，一旦子系统数量众多，那么用户则需要在多个系统中进行登录，用户体验相当差。</p>
 <a id="more"></a>
 
@@ -128,7 +135,7 @@
   </entry>
   <entry>
     <title>单点登录（四）</title>
-    <url>/2020/06/05/ckbt09m95000gl0vj6f9v9m5d/</url>
+    <url>/2020/06/05/ckhuc25qq000g24vj5qwvfy9z/</url>
     <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>经过之前几篇文章的介绍以及Demo项目的搭建，加深了对CAS概念的理解，掌握了基础的应用方式。本文主要是从代码层面上对整个认证流程进行一个梳理，加深我们对CAS框架认证流程的一个认识。</p>
 <a id="more"></a>
 
@@ -225,7 +232,7 @@
   </entry>
   <entry>
     <title>单点登录（三）</title>
-    <url>/2020/06/03/ckbt09m96000hl0vjdm8kdrpk/</url>
+    <url>/2020/06/03/ckhuc25qq000h24vj5eikespd/</url>
     <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>CAS Server的基本定制已经完成，接下来就需要对Client进行开发和测试，保证整个业务流程的正确性。这里通过两个client项目进行演示：其中一个项目使用filter方式进行认证；而另一个项目则采用spring security cas的方式进行认证。</p>
 <a id="more"></a>
 
@@ -319,7 +326,7 @@
   </entry>
   <entry>
     <title>单点登录（二）</title>
-    <url>/2020/06/02/ckbt09m97000jl0vj8xjxhoz0/</url>
+    <url>/2020/06/02/ckhuc25qr000j24vjbuupc1t7/</url>
     <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>已经对SSO以及CAS的基本概念和流程有了一定了解之后，就可以开始着手实现自己的CAS认证服务器了。本文主要讲解如何在本地使用HTTPS的方式启动CAS Server，以及定制CAS Server的部分页面。</p>
 <a id="more"></a>
 
@@ -459,7 +466,7 @@
   </entry>
   <entry>
     <title>Nacos配置中心</title>
-    <url>/2020/06/15/ckbt09m9k000pl0vj79453ile/</url>
+    <url>/2020/06/15/ckhuc25r4000p24vjha8o4blp/</url>
     <content><![CDATA[<h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p>Nacos 致力于帮助您发现、配置和管理微服务。Nacos 提供了一组简单易用的特性集，帮助您快速实现动态服务发现、服务配置、服务元数据及流量管理。</p>
 <a id="more"></a>
 

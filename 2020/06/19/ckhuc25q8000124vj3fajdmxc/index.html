@@ -13,7 +13,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    单点登录（一） |  唯
+    Centos下使用Docker部署MySql |  唯
   </title>
   <meta name="generator" content="hexo-theme-ayer">
   
@@ -46,7 +46,7 @@
   <div id="app">
     <main class="content on">
       <section class="outer">
-  <article id="post-单点登录（一）" class="article article-type-post" itemscope
+  <article id="post-Centos下使用Docker部署MySql" class="article article-type-post" itemscope
   itemprop="blogPost" data-scroll-reveal>
 
   <div class="article-inner">
@@ -54,7 +54,7 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  单点登录（一）
+  Centos下使用Docker部署MySql
 </h1>
  
 
@@ -63,12 +63,12 @@
 
     
     <div class="article-meta">
-      <a href="/2020/06/01/ckbt09m8r0002l0vjfd3u276h/" class="article-date">
-  <time datetime="2020-06-01T06:08:33.000Z" itemprop="datePublished">2020-06-01</time>
+      <a href="/2020/06/19/ckhuc25q8000124vj3fajdmxc/" class="article-date">
+  <time datetime="2020-06-19T08:29:13.000Z" itemprop="datePublished">2020-06-19</time>
 </a>
       
   <div class="article-category">
-    <a class="article-category-link" href="/categories/CAS/">CAS</a>
+    <a class="article-category-link" href="/categories/Mysql/">Mysql</a>
   </div>
 
       
@@ -78,7 +78,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> 字数统计:</span>
-            <span class="post-count">1.2k</span>
+            <span class="post-count">1.3k</span>
         </span>
     </span>
 
@@ -87,7 +87,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> 阅读时长≈</span>
-            <span class="post-count">4 分钟</span>
+            <span class="post-count">5 分钟</span>
         </span>
     </span>
 </div>
@@ -112,50 +112,71 @@
       
 
       
-      <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>在分布式环境中，存在多个子系统，每个子系统独立部署。当用户登录其中一个系统之后，若需要访问另一个系统，使用传统方式session的话，就需要用户登录，一旦子系统数量众多，那么用户则需要在多个系统中进行登录，用户体验相当差。</p>
+      <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>在centos服务器上，基于docker安装mysql8并对外提供服务，主要记录一下基本的安装部署流程，以及整个过程中所遇到的问题。</p>
 <a id="more"></a>
 
-<h3 id="解决方式"><a href="#解决方式" class="headerlink" title="解决方式"></a>解决方式</h3><p>单点登录（Single Sign On），简称为 SSO，是目前比较流行的企业业务整合的解决方案之一。SSO 的定义是在多个应用系统中，用户只需要登录一次就可以访问所有相互信任的应用系统。</p>
-<h4 id="同域下的单点登录"><a href="#同域下的单点登录" class="headerlink" title="同域下的单点登录"></a>同域下的单点登录</h4><p>一个企业一般情况下只有一个域名，通过二级域名区分不同的系统。比如我们有个域名叫做：a.com，同时有两个业务系统分别为：app1.a.com和app2.a.com。我们要做单点登录（SSO），需要一个登录系统，叫sso.a.com。</p>
-<p>我们只要在sso.a.com登录，app1.a.com和app2.a.com就也登录了。通过上面的登陆认证机制，我们可以知道，在sso.a.com中登录了，其实是在sso.a.com的服务端的session中记录了登录状态，同时在浏览器端（Browser）的sso.a.com下写入了Cookie。那么我们怎么才能让app1.a.com和app2.a.com登录呢？这里有两个问题：</p>
+<h3 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h3><ol>
+<li><p>拉取mysql镜像</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull mysql</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>创建shell脚本文件，方便启动mysql服务</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">docker run \</span><br><span class="line">    -p 3306:3306 \</span><br><span class="line">    -e MYSQL_ROOT_PASSWORD&#x3D;Passw0rd \</span><br><span class="line">    -v &#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;mysqld:&#x2F;var&#x2F;run&#x2F;mysqld:rw \</span><br><span class="line">    -v &#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;data:&#x2F;var&#x2F;lib&#x2F;mysql:rw \</span><br><span class="line">    -v &#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;log:&#x2F;var&#x2F;log&#x2F;mysql:rw \</span><br><span class="line">    -v &#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;config&#x2F;my.cnf:&#x2F;etc&#x2F;mysql&#x2F;my.cnf:rw \</span><br><span class="line">    -v &#x2F;home&#x2F;vsftp&#x2F;mysql&#x2F;mysql-files:&#x2F;var&#x2F;lib&#x2F;mysql-files:rw \</span><br><span class="line">    -v &#x2F;etc&#x2F;localtime:&#x2F;etc&#x2F;localtime:ro \</span><br><span class="line">    --name mysql8 \</span><br><span class="line">    --restart&#x3D;always \</span><br><span class="line">    -d mysql</span><br></pre></td></tr></table></figure>
+
+<p><strong>参数说明</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"># 首先需要创建好路径，否则会报错！如[&#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;]，创建好路径之后，使用chmod指令赋予权限，避免权限不足导致的容器启动报错</span><br><span class="line"></span><br><span class="line"># 端口映射，容器端口和服务器端口</span><br><span class="line">-p 3306:3306 \</span><br><span class="line"></span><br><span class="line"># 数据库启动之后的初始root密码</span><br><span class="line">-e MYSQL_ROOT_PASSWORD&#x3D;Passw0rd</span><br><span class="line"></span><br><span class="line"># mysqld用于存放mysql启动之后生成的mysql.socket对象，遇到了启动后报错： Can&#39;t connect to local MySQL server through socket &#39;&#x2F;var&#x2F;run&#x2F;mysqld&#x2F;mysqld.sock&#39; (2)，可以通过映射来解决</span><br><span class="line">-v &#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;mysqld:&#x2F;var&#x2F;run&#x2F;mysqld:rw \</span><br><span class="line"></span><br><span class="line"># 数据库文件存放的地方。必须要挂载到服务器，否则容器重启一切数据消失。</span><br><span class="line">-v &#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;data:&#x2F;var&#x2F;lib&#x2F;mysql:rw \</span><br><span class="line"></span><br><span class="line">#  是数据库主生的log。建议挂载到服务器</span><br><span class="line">-v &#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;log:&#x2F;var&#x2F;log&#x2F;mysql:rw \</span><br><span class="line"></span><br><span class="line">#  是数据库的配置文件，建议挂载到服务器，方便配置</span><br><span class="line">-v &#x2F;home&#x2F;vsftpd&#x2F;mysql&#x2F;config&#x2F;my.cnf:&#x2F;etc&#x2F;mysql&#x2F;my.cnf:rw \</span><br><span class="line"></span><br><span class="line"># 是让容器的时钟与宿主机时钟同步，避免时区的问题，ro是read only</span><br><span class="line">-v &#x2F;etc&#x2F;localtime:&#x2F;etc&#x2F;localtime:ro \</span><br><span class="line"></span><br><span class="line"># 容器名</span><br><span class="line">--name mysql8 \</span><br><span class="line"></span><br><span class="line"># 挂掉之后自动重启</span><br><span class="line">--restart&#x3D;always \</span><br><span class="line"></span><br><span class="line"># -d 后台启动</span><br><span class="line">-d mysql</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>my.cnf配置文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"># Copyright (c) 2017, Oracle and&#x2F;or its affiliates. All rights reserved.</span><br><span class="line">#</span><br><span class="line"># This program is free software; you can redistribute it and&#x2F;or modify</span><br><span class="line"># it under the terms of the GNU General Public License as published by</span><br><span class="line"># the Free Software Foundation; version 2 of the License.</span><br><span class="line">#</span><br><span class="line"># This program is distributed in the hope that it will be useful,</span><br><span class="line"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span><br><span class="line"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span><br><span class="line"># GNU General Public License for more details.</span><br><span class="line">#</span><br><span class="line"># You should have received a copy of the GNU General Public License</span><br><span class="line"># along with this program; if not, write to the Free Software</span><br><span class="line"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA</span><br><span class="line"></span><br><span class="line">#</span><br><span class="line"># The MySQL  Server configuration file.</span><br><span class="line">#</span><br><span class="line"># For explanations see</span><br><span class="line"># http:&#x2F;&#x2F;dev.mysql.com&#x2F;doc&#x2F;mysql&#x2F;en&#x2F;server-system-variables.html</span><br><span class="line"></span><br><span class="line">[mysqld]</span><br><span class="line">pid-file        &#x3D; &#x2F;var&#x2F;run&#x2F;mysqld&#x2F;mysqld.pid</span><br><span class="line">socket          &#x3D; &#x2F;var&#x2F;run&#x2F;mysqld&#x2F;mysqld.sock</span><br><span class="line">datadir         &#x3D; &#x2F;var&#x2F;lib&#x2F;mysql</span><br><span class="line"># 忽略数据库表的大小写，这个配置必须在初始化的时候开启，等数据库初始化完成之后，再添加会报错：</span><br><span class="line"># Different lower_case_table_names settings for server (&#39;1&#39;) and data dictionary(&#39;0&#39;).</span><br><span class="line">lower_case_table_names &#x3D; 1</span><br><span class="line">secure-file-priv&#x3D; NULL</span><br><span class="line"># Disabling symbolic-links is recommended to prevent assorted security risks</span><br><span class="line">symbolic-links&#x3D;0</span><br><span class="line"></span><br><span class="line"># Custom config should go here</span><br><span class="line">!includedir &#x2F;etc&#x2F;mysql&#x2F;conf.d&#x2F;</span><br><span class="line"># mysql8的安全机制升级而需要修改的配置，不配置的话将无法登录管理</span><br><span class="line">default_authentication_plugin&#x3D; mysql_native_password</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>mysql配置</p>
 <ul>
-<li>Cookie是不能跨域的，认证系统中Cookie的domain属性是sso.a.com，在给app1.a.com和app2.a.com发送请求是带不上的。<strong>在设置Cookie的时候，其domain的值只能是当前域名或者顶级域名，不能设置为其他域名</strong></li>
-<li>sso、app1和app2是不同的应用，它们的session存在自己的应用内，是不共享的。</li>
-</ul>
-<p><img src="/images/sso/2.png" alt="avatar"></p>
-<p>解决上述两问题的方法：</p>
+<li><p>使用 <code>docker exec -it mysql8 /bin/bash</code> 进入容器</p>
+</li>
+<li><p>使用 <code>mysql -uroot -p</code> 进入mysql</p>
+</li>
+<li><p>确保root用户的登陆没有ip限制</p>
 <ul>
-<li>sso登录之后，把Cookie的domain属性设置到顶级域名a.com下，所有子系统都可以访问顶级域名的Cookie了。</li>
-<li>将sso、app1、app2这三个系统的session进行共享，可以通过spring-session进行实现</li>
+<li><p><code>use mysql</code> 切换到mysql表</p>
+</li>
+<li><p><code>select user,host from user</code> 查询所有用户的host信息</p>
+</li>
+<li><p><code>grant all privileges on *.*  to &#39;root&#39;@&#39;%&#39; ; flush privileges;</code> 执行语句，将root用户的host更新为%，即不受ip限制</p>
+<p><img src="/images/docker_mysql/2.png" alt="avatar"></p>
+</li>
 </ul>
-<h4 id="不同域下的单点登录"><a href="#不同域下的单点登录" class="headerlink" title="不同域下的单点登录"></a>不同域下的单点登录</h4><p>同域下的单点登录是巧用了Cookie和Session共享来实现的，那么在不同域名的情况下，各个系统之间要实现单点登录，那么就需要采用CAS的方式。</p>
-<p>CAS 是 Yale 大学发起的一个开源项目，旨在为 Web 应用系统提供一种可靠的单点登录方法，CAS 在 2004 年 12 月正式成为 JA-SIG 的一个项目。CAS 具有以下特点：</p>
-<ul>
-<li>开源的企业级单点登录解决方案。</li>
-<li>CAS Server 为需要独立部署的 Web 应用。这个CAS框架已经提供</li>
-<li>CAS Client 支持非常多的客户端(这里指单点登录系统中的各个 Web 应用)，包括Java, .Net, PHP, Perl, Apache, uPortal, Ruby 等。</li>
+</li>
 </ul>
-<p>从结构上看，CAS 包含两个部分： CAS Server 和 CAS Client。CAS Server 需要独立部署，主要负责对用户的认证工作；CAS Client 负责处理对客户端受保护资源的访问请求，需要登录时，重定向到 CAS Server。</p>
-<p>流程图：</p>
-<p><img src="/images/sso/1.png" alt="avatar"></p>
-<p>流程简述：</p>
-<ol>
-<li>用户访问app系统，app系统是需要登录的，但用户现在没有登录。</li>
-<li>跳转到CAS server，即SSO登录系统，<strong>以后图中的CAS Server我们统一叫做SSO系统。</strong> SSO系统也没有登录，弹出用户登录页。</li>
-<li>用户填写用户名、密码，SSO系统进行认证后，将登录状态写入SSO的session，浏览器（Browser）中写入SSO域下的Cookie。</li>
-<li>SSO系统登录完成后会生成一个ST（Service Ticket），然后跳转到app系统，同时将ST作为参数传递给app系统。</li>
-<li>app系统拿到ST后，从后台向SSO发送请求，验证ST是否有效。</li>
-<li>验证通过后，app系统将登录状态写入session并设置app域下的Cookie。</li>
+</li>
+<li><p>开启centos的3306端口</p>
+<p><code>firewall-cmd --zone=public --add-port=3306/tcp --permanent</code>开启3306端口访问</p>
+<p><code>firewall-cmd --reload</code>重启防火墙，使配置生效</p>
+</li>
 </ol>
-<p>至此，跨域单点登录就完成了。以后我们再访问app系统时，app就是登录的。接下来，我们再看看访问app2系统时的流程。</p>
-<ol>
-<li>用户访问app2系统，app2系统没有登录，跳转到SSO。</li>
-<li>由于SSO已经登录了，不需要重新登录认证。</li>
-<li>SSO生成ST，浏览器跳转到app2系统，并将ST作为参数传递给app2。</li>
-<li>app2拿到ST，后台访问SSO，验证ST是否有效。</li>
-<li>验证成功后，app2将登录状态写入session，并在app2域下写入Cookie。</li>
+<h3 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h3><ol>
+<li><p>mysql.socket</p>
+<p><img src="/images/docker_mysql/3.png" alt="avatar"></p>
+<p>由于在my.cnf配置文件中<code>socket = /var/run/mysqld/mysqld.sock</code>已经配置了，但是不知道为何在容器启动好之后，依旧提示mysql.socket问题，索性这里就直接将mysqld这个文件夹也映射到了服务器上，从而才解决了这个问题。不过mysql容器刚启动好之后，登陆到容器中也会遇到这个问题，不过多试几次就好了。</p>
+</li>
+<li><p>Navicat连接容器mysql报错10060 error</p>
+<p><img src="/images/docker_mysql/1.png" alt="avatar"></p>
+<p>这里无法连接上有三种情况</p>
+<ul>
+<li>root用户有ip限制，无法进行远程登陆</li>
+<li>mysql服务未启动</li>
+<li>服务器防火墙问题</li>
+</ul>
+<p>我所遇到的是第三种情况，当把centos中的防火墙关掉之后，就可以连接上了，开启就不行。后来经过如下操作，就可以正常进行连接了，也不用关闭防火墙</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl stop firewalld</span><br><span class="line">sudo systemctl restart docker</span><br><span class="line">sudo systemctl start firewalld</span><br></pre></td></tr></table></figure>
+
+
+</li>
 </ol>
-<p>这样，app2系统不需要走登录流程，就已经是登录了。SSO，app和app2在不同的域，它们之间的session不共享也是没问题的。</p>
+<ol start="3">
+<li><p>若mysql启动失败了，需要手动清除/home/vsftp/mysql/data路径下的数据库文件，否则启动会报错：</p>
+<p>docker mysql:Different lower_case_table_names settings for server (‘2‘) and data dictionary (‘0‘).</p>
+<p>原因在于只有第一次初始化数据库的时候在my.cnf中配置的lower_case_table_names = 1才起作用</p>
+</li>
+</ol>
 
       
       <!-- reward -->
@@ -220,14 +241,14 @@
     <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://yoursite.com/2020/06/01/ckbt09m8r0002l0vjfd3u276h/" alt="微信分享二维码">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://yoursite.com/2020/06/19/ckhuc25q8000124vj3fajdmxc/" alt="微信分享二维码">
     </div>
 </div>
 
 <div id="share-mask"></div>
       
       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CAS/" rel="tag">CAS</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Centos/" rel="tag">Centos</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Docker/" rel="tag">Docker</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Mysql/" rel="tag">Mysql</a></li></ul>
 
 
     </footer>
@@ -238,15 +259,11 @@
   
   <nav class="article-nav">
     
-      <a href="/2020/06/02/ckbt09m97000jl0vj8xjxhoz0/" class="article-nav-link">
-        <strong class="article-nav-caption">上一篇</strong>
-        <div class="article-nav-title">
-          
-            单点登录（二）
-          
-        </div>
-      </a>
     
+      <a href="/2020/06/15/ckhuc25r4000p24vjha8o4blp/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">Nacos配置中心</div>
+      </a>
     
   </nav>
 
